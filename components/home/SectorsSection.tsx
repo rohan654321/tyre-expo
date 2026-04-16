@@ -95,22 +95,21 @@ export default function SectorsSection() {
   {/* TEXT + BUTTON */}
   <div className="absolute bottom-0 left-0 p-5 text-white w-full">
 
-    <h3 className="text-xl font-bold leading-tight">
-      {sector.title}
-    </h3>
+   <h3 className="font-heading text-[18px] sm:text-[20px] lg:text-[22px] tracking-[1px] font-bold leading-[1.3]">
+  {sector.title}
+</h3>
 
-    <p className="text-sm text-white/90 mt-2 line-clamp-2">
-      {sector.shortText}
-    </p>
+   <p className="font-sans text-[14px] text-white/90 mt-2 leading-[1.7] line-clamp-2">
+  {sector.shortText}
+</p>
 
     {/* 🔥 READ MORE BUTTON */}
-    <Link
-    href={'#'}
-    //   href={`/sectors/${sector.slug}/`}
-      className="inline-block mt-3 text-sm font-semibold text-[#F08400] hover:underline"
-    >
-      Read More →
-    </Link>
+ <Link
+  href={'#'}
+  className="inline-block mt-4 font-sans text-[13px] font-semibold uppercase tracking-[1px] text-[#F08400] hover:underline"
+>
+  Read More →
+</Link>
 
   </div>
 

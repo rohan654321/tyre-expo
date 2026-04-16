@@ -12,9 +12,9 @@ export default function Footer() {
           {/* Logo */}
           <div>
             <Image
-              src="/imgs/logo-1.png"
+              src="/ITS.png"
               alt="MiningWorld Russia"
-              width={200}
+              width={100}
               height={60}
               className="object-contain"
             />

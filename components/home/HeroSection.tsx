@@ -62,31 +62,34 @@ export default function HeroSection() {
           ))}
         </div>
       </div>
-
-    <div className="w-full flex flex-col lg:flex-row items-end justify-between pb-20 gap-16 px-6 lg:px-12">
+      <div className="w-full flex flex-col lg:flex-row items-end justify-between pb-24 gap-12 px-6 lg:px-16">
 
   {/* LEFT CONTENT */}
-  <div className="max-w-7xl">
+  <div className="max-w-8xl">
     
     {/* BIG HEADING */}
-    <h1 className="text-[48px] sm:text-[72px] lg:text-[110px] font-extrabold leading-[1.05] tracking-tight">
-      <span className="text-white">MINING WORLD </span>
-      <span className="text-[#F08400]">2026</span>
-    </h1>
+<h1 className="font-heading uppercase whitespace-nowrap 
+text-[28px] sm:text-[52px] lg:text-[90px] 
+leading-[0.9] tracking-[1px] 
+max-w-[900px]">
+  <span className="text-white">MINING WORLD </span>
+  <span className="text-[#F08400]">2026</span>
+</h1>
 
     {/* DESCRIPTION */}
-    <p className="mt-6 text-base sm:text-lg lg:text-xl text-white/90 leading-relaxed max-w-4xl">
-      Celebrating 30 Years of Driving Mining Innovation and Business Growth. 
-      MiningWorld Russia unites equipment manufacturers, technology pioneers, 
-      and buyers from across the CIS to accelerate the future of mining and mineral processing.
-    </p>
+<p className="mt-6 font-sans text-[16px] sm:text-[18px] lg:text-[20px] 
+text-white/90 leading-[1.5] max-w-7xl">
+  Celebrating 30 Years of Driving Mining Innovation and Business Growth. 
+  MiningWorld Russia unites equipment manufacturers, technology pioneers, 
+  and buyers from across the CIS to accelerate the future of mining and mineral processing.
+</p>
   </div>
 
   {/* RIGHT BUTTON */}
   <div className="flex-shrink-0">
     <Link
       href="/exhibiting-enquiry/"
-      className="bg-[#F08400] px-8 py-4 text-lg font-bold uppercase tracking-wide hover:bg-orange-600 transition"
+      className="bg-[#F08400] px-10 py-4 text-sm font-semibold uppercase tracking-[1.5px] hover:bg-orange-600 transition-all duration-300"
     >
       Exhibit
     </Link>

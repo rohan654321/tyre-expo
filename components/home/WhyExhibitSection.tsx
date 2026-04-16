@@ -21,28 +21,28 @@ export default function WhyExhibitSection() {
 
           {/* HEADING */}
           <div className="flex flex-col gap-3">
-            <h2 className="text-[50px] lg:text-[70px] font-extrabold leading-[0.95] text-[#F08400]">
-              WHY EXHIBIT
-            </h2>
+         <h2 className="font-heading text-[48px] sm:text-[60px] lg:text-[72px] leading-[1.05] tracking-[2px] text-[#F08400] uppercase">
+  WHY EXHIBIT
+</h2>
 
-            <h2 className="text-[50px] lg:text-[70px] font-extrabold leading-[0.95] text-white">
-              AT  TYRE SHOW?
-            </h2>
+
+         <h2 className="font-heading text-[48px] sm:text-[60px] lg:text-[72px] leading-[1.05] tracking-[2px] text-white uppercase">
+  AT TYRE SHOW?
+</h2>
           </div>
 
           {/* DESCRIPTION */}
-          <p className="text-gray-400 text-lg leading-relaxed max-w-[600px]">
-            In a market defined by rapid modernisation, localisation, and sustainability demands,
+<p className="font-sans text-[16px] sm:text-[18px] text-gray-400 leading-[1.8] max-w-[600px]">            In a market defined by rapid modernisation, localisation, and sustainability demands,
             India Tyre Show provides direct access to decision-makers shaping the future of tyre
             manufacturing and rubber technology across the globe. It’s where global suppliers connect
             with real projects, demonstrate ROI-driven technologies, and secure long-term growth opportunities.
           </p>
 
           {/* BUTTON */}
-          <Link
-            href="/why-exhibit/"
-            className="mt-4 w-fit bg-[#F08400] px-8 py-4 font-bold uppercase tracking-wide hover:bg-orange-600 transition"
-          >
+         <Link
+  href="/why-exhibit/"
+  className="mt-6 w-fit bg-[#F08400] px-8 py-4 font-sans text-sm font-semibold uppercase tracking-[1.5px] hover:bg-orange-600 transition"
+>
             Explore Benefits of Participating
           </Link>
         </div>
@@ -56,14 +56,14 @@ export default function WhyExhibitSection() {
               className="flex items-start gap-6 border-b border-white/20 pb-6 pt-6 first:pt-0"
             >
               {/* NUMBER */}
-              <span className="text-gray-500 text-xl font-bold">
-                {index + 1}.
-              </span>
+            <span className="text-gray-500 text-lg font-semibold font-sans">
+  {index + 1}.
+</span>
 
               {/* TEXT */}
-              <p className="text-[20px] lg:text-[26px] font-semibold leading-snug text-gray-300 uppercase">
-                {text}
-              </p>
+            <p className="font-heading text-[18px] sm:text-[20px] lg:text-[24px] tracking-[1px] font-semibold leading-[1.4] text-gray-300 uppercase">
+  {text}
+</p>
             </div>
           ))}
 

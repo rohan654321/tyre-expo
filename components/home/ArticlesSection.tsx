@@ -28,14 +28,14 @@ export default function ArticlesSection({ articles }: ArticlesSectionProps) {
 
         <div className="max-w-[900px]">
 
-          <p className="text-[#F08400] font-semibold text-sm mb-2">
-            Articles
-          </p>
+          <p className="text-[#F08400] font-sans text-[14px] uppercase tracking-[1.5px]">
+  Articles
+</p>
 
           {/* 🔥 ONE LINE TITLE */}
-          <h2 className="text-[28px] sm:text-[34px] lg:text-[42px] font-extrabold leading-[1.1] text-black">
-            EVENT INSIGHTS & INDUSTRY TRENDS
-          </h2>
+        <h2 className="font-heading text-[32px] sm:text-[44px] lg:text-[56px] leading-[1.05] tracking-[2px] uppercase text-black">
+  EVENT INSIGHTS & INDUSTRY TRENDS
+</h2>
 
           <p className="text-gray-600 mt-3 text-base">
             Stay up to date with the latest updates in the industry and the show

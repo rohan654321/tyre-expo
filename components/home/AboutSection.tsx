@@ -30,17 +30,17 @@ export default function AboutSection() {
         <div className="flex flex-col gap-6 max-w-[800px]">
 
           {/* SMALL TITLE */}
-          <p className="text-[#F08400] font-semibold text-lg">
+          <p className="text-[#F08400] font-sans text-[14px] uppercase tracking-[1.5px]">
             About India Tyre Show
           </p>
 
           {/* BIG HEADING */}
-<h2 className="text-[32px] sm:text-[40px] lg:text-[48px] font-extrabold leading-[1.1] text-black">
+<h2 className="font-heading text-[22px] sm:text-[40px] lg:text-[52px] leading-[1.20] tracking-[2px] uppercase text-black">
   POWERING THE FUTURE OF TYRE INDUSTRY
 </h2>
 
           {/* DESCRIPTION */}
-          <p className="text-gray-700 text-base sm:text-lg leading-relaxed max-w-[800px]">
+          <p className="font-sans text-[16px] sm:text-[18px] text-gray-700 leading-[1.6] max-w-7xl">
             For three decades, India Tyre Show has been the premier international exhibition 
             for tyre manufacturing and rubber technology. It brings together global tyre professionals, 
             decision-makers, and innovators to connect, collaborate, and explore the technologies 
@@ -53,7 +53,7 @@ export default function AboutSection() {
           </p>
 
           {/* STATS */}
-          <div className="mt-4 w-full">
+          <div className="mt-4 max-w-7xl">
   <StatsGrid stats={statsData} />
 </div>
 
@@ -61,7 +61,7 @@ export default function AboutSection() {
           <div className="mt-6">
             <Button
               href="/about-indiatyreshow/"
-              className="bg-[#F08400] text-white px-8 py-4 text-base font-bold uppercase hover:bg-orange-600"
+              className="bg-[#F08400] text-white px-10 py-4 text-sm font-semibold uppercase tracking-[1.5px] hover:bg-orange-600 transition-all duration-300"
             >
               Learn More
             </Button>
