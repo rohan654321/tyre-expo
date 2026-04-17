@@ -35,13 +35,7 @@ const navItems = [
       { text: 'Partners and Sponsors', href: '/partners-and-sponsors/' },
     ],
   },
-  {
-    title: 'Connect',
-    links: [
-      { text: 'Lead Scanning', href: '/leadscanning/' },
-      { text: 'India Tyre Show Connect', href: '/connect/' },
-    ],
-  },
+
   {
     title: 'Insights',
     links: [
