@@ -102,7 +102,7 @@ export default function Footer() {
           <div className="flex items-center gap-2">
             <span className="text-sm">Organised By</span>
             <Image
-              src="/maxx_logo.png"
+              src="/maxx_logo (1).png"
               alt="ITE"
               width={70}
               height={25}

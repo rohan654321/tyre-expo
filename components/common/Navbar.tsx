@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ChevronDown } from 'lucide-react';
@@ -53,9 +53,18 @@ const navItems = [
 
 export default function Navbar() {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
 
+useEffect(() => {
+  const handleScroll = () => {
+    setIsScrolled(window.scrollY > 50);
+  };
+
+  window.addEventListener('scroll', handleScroll);
+  return () => window.removeEventListener('scroll', handleScroll);
+}, []);
   return (
-    <div className="bg-[#1e1e1e] py-3 text-white">
+    <div className="bg-[#1e1e1e]/80 py-3 text-white">
       <div className="container mx-auto px-10">
         {/* Logo and Navigation in one row */}
         <div className="flex items-start">
@@ -121,6 +130,24 @@ export default function Navbar() {
           <div className="w-10"></div>
         </div>
       </div>
+      {/* 🔥 Floating Exhibitor Login Button */}
+<div className="relative">
+  <div
+    className={`absolute right-10 -bottom-11 z-50 transition-all duration-500 ${
+      isScrolled
+  ? 'opacity-0 -translate-y-5 pointer-events-none'
+  : 'opacity-100 translate-y-0'
+    }`}
+  >
+    <Link
+      href="/exhibitor-login/"
+      className="bg-[#2A2A2A] text-white px-6 py-3  shadow-xl border border-white/20 
+      hover:bg-[#F08400] hover:text-black hover:scale-105 transition-all duration-300"
+    >
+      Exhibitor Login
+    </Link>
+  </div>
+</div>
     </div>
   );
 }

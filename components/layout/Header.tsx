@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Menu } from 'lucide-react';
-import { Button } from '../ui/button';
 import MobileMenu from '../common/MobileMenu';
 import Navbar from '../common/Navbar';
 
@@ -24,7 +23,7 @@ export default function Header() {
 
   // 🔥 Countdown Logic
   const calculateTimeLeft = () => {
-    const targetDate = new Date('2026-04-22T00:00:00').getTime();
+    const targetDate = new Date('2026-04-22T09:00:00').getTime();
     const now = new Date().getTime();
     const diff = targetDate - now;
 
@@ -53,79 +52,99 @@ export default function Header() {
     <>
       <header className="w-full text-white">
 
-        {/* 🔥 Top Bar */}
-        <div
-          className={`bg-[#1e1e1e]/80 py-2 transition-all duration-300 ${
-            isScrolled ? '-translate-y-full opacity-0' : 'translate-y-0 opacity-100'
-          }`}
-        >
-          <div className="container mx-auto flex items-center justify-between px-10">
-
-            {/* Left */}
-            <div className="flex gap-6 text-sm sm:text-base font-medium">
-              <span>22-24 April 2026</span>
-              <span>Crocus Expo, Pavilion 1</span>
-            </div>
-
-            {/* Right - Countdown */}
-            <div className="flex items-center gap-4 text-sm font-semibold">
-              <span>{timeLeft.days} Days</span>
-              <span>{timeLeft.hours} Hours</span>
-              <span>{timeLeft.minutes} Mins</span>
-            </div>
-          </div>
-        </div>
-
-        {/* 🔥 Logo Header */}
-        <div
-          className={`max-[1099px]:hidden bg-[#FFF4C9] transition-all duration-300 ${
-            isScrolled ? '-translate-y-full opacity-0' : 'translate-y-0 opacity-100'
-          }`}
-        >
-          <div className="container mx-auto flex items-center justify-between px-10 py-3">
-
-            {/* Logo */}
-            <Link href="/">
-              <Image
-                src="/ITS_logo final.png"
-                alt="India Tyre Show"
-                width={130}
-                height={70}
-                className="object-contain"
-              />
-            </Link>
-
-            {/* Buttons */}
-            <div className="flex items-center gap-4">
-              <Link
-                href="/exhibiting-enquiry/"
-                className="bg-[#F08400] px-6 py-3 text-base font-bold uppercase tracking-wide hover:bg-black transition"
-              >
-                Exhibit
-              </Link>
-
-              <Link
-                href="/visitor-registration/"
-                className="bg-[#F08400] px-6 py-3 text-base font-bold uppercase tracking-wide hover:bg-black transition"
-              >
-                Register
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        {/* 🔥 Sticky Navbar */}
+        {/* 🔥 Main Header */}
         <div
           className={`max-[1099px]:hidden transition-all duration-300 ${
             isScrolled
-              ? 'fixed top-0 left-0 w-full z-50 bg-[#1e1e1e]/90 backdrop-blur-md shadow-lg'
-              : 'relative'
+  ? '-translate-y-full opacity-0'
+  : 'translate-y-0 opacity-100 bg-[#1e1e1e]'
           }`}
         >
-          <Navbar />
+          <div className="container mx-auto flex items-center justify-between px-10 py-4">
+
+            {/* 🔥 Left Section */}
+            <div className="flex items-center gap-6">
+
+              {/* Logo */}
+              <Link href="/">
+                <Image
+                  src="/ITS_logo_white.png"
+                  alt="India Tyre Show"
+                  width={130}
+                  height={70}
+                  className="object-contain"
+                />
+              </Link>
+
+              {/* Divider */}
+              <div className="h-10 w-[1px] bg-white/30"></div>
+
+              {/* Event Info */}
+              <div className="flex flex-col text-[20px] leading-tight">
+                <span className="font-semibold">22–24 April 2026</span>
+                <span className="text-white/70">Crocus Expo, Pavilion 1</span>
+              </div>
+            </div>
+
+            {/* 🔥 Right Section */}
+            <div className="flex items-center gap-6">
+
+              {/* ⏱️ Countdown */}
+              <div className="flex gap-3">
+                {[
+                  { label: 'Days', value: timeLeft.days },
+                  { label: 'Hours', value: timeLeft.hours },
+                  { label: 'Mins', value: timeLeft.minutes },
+                ].map((item, i) => (
+                  <div
+                    key={i}
+                    className="flex flex-col items-center justify-center bg-white/10 px-4 py-2  backdrop-blur-md border border-white/20 transition-all duration-300 hover:bg-[#F08400] hover:text-black hover:scale-105"
+                  >
+                    <span className="text-lg font-bold">
+                      {String(item.value).padStart(2, '0')}
+                    </span>
+                    <span className="text-xs uppercase tracking-wide">
+                      {item.label}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* 🔥 Buttons */}
+         <div className="flex items-center gap-4">
+  <Link
+    href="/exhibiting-enquiry/"
+    className="bg-[#F08400] px-8 py-5 text-base font-bold uppercase tracking-wide  shadow-md 
+    hover:bg-white hover:text-black hover:shadow-lg hover:scale-105 transition-all duration-300"
+  >
+    Exhibit
+  </Link>
+
+  <Link
+    href="/visitor-registration/"
+    className="bg-[#F08400] px-8 py-5 text-base font-bold uppercase tracking-wide  shadow-md 
+    hover:bg-white hover:text-black hover:shadow-lg hover:scale-105 transition-all duration-300"
+  >
+    Register
+  </Link>
+</div>
+            </div>
+          </div>
         </div>
 
-        {/* 🔥 Mobile Header */}
+        {/* 🔥 Navbar */}
+{/* 🔥 Navbar */}
+<div
+  className={`max-[1099px]:hidden transition-all duration-300 ${
+    isScrolled
+      ? 'fixed top-0 left-0 w-full z-50 bg-[#1e1e1e] shadow-lg'
+      : 'relative'
+  }`}
+>
+  <Navbar />
+</div>
+
+        {/* 📱 Mobile Header */}
         <div className="bg-black px-4 py-3 min-[1100px]:hidden fixed top-0 left-0 w-full z-50">
           <div className="flex items-center justify-between">
 
@@ -146,9 +165,7 @@ export default function Header() {
         </div>
       </header>
 
-      
-
-      {/* Mobile Menu */}
+      {/* 📱 Mobile Menu */}
       <MobileMenu
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
