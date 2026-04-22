@@ -55,7 +55,7 @@ export default function Header() {
 
         {/* 🔥 Top Bar */}
         <div
-          className={`bg-[#432500] py-2 transition-all duration-300 ${
+          className={`bg-[#1e1e1e]/80 py-2 transition-all duration-300 ${
             isScrolled ? '-translate-y-full opacity-0' : 'translate-y-0 opacity-100'
           }`}
         >
@@ -78,7 +78,7 @@ export default function Header() {
 
         {/* 🔥 Logo Header */}
         <div
-          className={`max-[1099px]:hidden bg-black transition-all duration-300 ${
+          className={`max-[1099px]:hidden bg-[#FFF4C9] transition-all duration-300 ${
             isScrolled ? '-translate-y-full opacity-0' : 'translate-y-0 opacity-100'
           }`}
         >
@@ -87,10 +87,10 @@ export default function Header() {
             {/* Logo */}
             <Link href="/">
               <Image
-                src="/ITS.png"
+                src="/ITS_logo.png"
                 alt="India Tyre Show"
-                width={100}
-                height={50}
+                width={130}
+                height={70}
                 className="object-contain"
               />
             </Link>
@@ -99,14 +99,14 @@ export default function Header() {
             <div className="flex items-center gap-4">
               <Link
                 href="/exhibiting-enquiry/"
-                className="bg-[#F08400] px-6 py-3 text-base font-bold uppercase tracking-wide hover:bg-transparent transition"
+                className="bg-[#F08400] px-6 py-3 text-base font-bold uppercase tracking-wide hover:bg-black transition"
               >
                 Exhibit
               </Link>
 
               <Link
                 href="/visitor-registration/"
-                className="bg-[#F08400] px-6 py-3 text-base font-bold uppercase tracking-wide hover:bg-transparent transition"
+                className="bg-[#F08400] px-6 py-3 text-base font-bold uppercase tracking-wide hover:bg-black transition"
               >
                 Register
               </Link>

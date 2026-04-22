@@ -48,6 +48,7 @@ const navItems = [
     ],
   },
   { title: 'Contact us', href: '/contact-us/', links: [] },
+  { title: 'Conference', href: '/conference/', links: [] },
 ];
 
 export default function Navbar() {

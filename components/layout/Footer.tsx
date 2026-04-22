@@ -12,7 +12,7 @@ export default function Footer() {
           {/* Logo */}
           <div>
             <Image
-              src="/ITS.png"
+              src="/ITS_logo.png"
               alt="MiningWorld Russia"
               width={100}
               height={60}
