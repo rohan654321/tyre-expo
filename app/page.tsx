@@ -1,3 +1,4 @@
+// app/page.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -15,6 +16,7 @@ import BrochureSection from '@/components/home/BrochureSection';
 import ArticlesSection from '@/components/home/ArticlesSection';
 import NewsletterSection from '@/components/home/NewsletterSection';
 import PartnersSection from '@/components/home/PartnersSection';
+import { getLatestArticles } from '@/app/articles/data'; // Import from your data.ts
 
 // Sample data - replace with actual data from API
 const countriesData = [
@@ -46,32 +48,11 @@ const outcomesData = [
   },
 ];
 
-const articlesData = [
-  {
-    title: 'Innovations in Tyre Manufacturing Technology That Are Improving Sustainability and ROI',
-    slug: 'innovations-in-tyre-manufacturing-technology',
-    excerpt: 'Sustainable tyre manufacturing technology combines advanced materials, AI, and low-impact processes...',
-    image: 'https://cdn.itegroupnews.com/mw24_1074_1_min_ff15b1a4db.webp',
-    date: '20.09.2025',
-  },
-  {
-    title: 'The Future of Smart Tyres: How IoT is Revolutionizing the Industry',
-    slug: 'future-of-smart-tyres-iot',
-    excerpt: 'Smart tyre technology with IoT sensors is transforming vehicle safety and performance monitoring...',
-    image: 'https://cdn.itegroupnews.com/2_1_27606a9b16.webp',
-    date: '03.09.2025',
-  },
-  {
-    title: 'Sustainable Materials: The Next Frontier in Tyre Production',
-    slug: 'sustainable-materials-tyre-production',
-    excerpt: 'Eco-friendly materials and green manufacturing processes are reshaping the tyre industry...',
-    image: 'https://cdn.itegroupnews.com/mnng25_2100_540e751921.webp',
-    date: '29.08.2025',
-  },
-];
-
 export default function HomePage() {
   const [isLoading, setIsLoading] = useState(true);
+  
+  // ✅ Use your existing data.ts - get the 3 latest articles
+  const articlesData = getLatestArticles(3);
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 1500);
