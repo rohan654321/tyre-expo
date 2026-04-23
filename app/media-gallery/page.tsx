@@ -4,6 +4,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import BackToTop from "@/components/layout/BackToTop";
 
 // Mock Data - In production, fetch from CMS
 const galleryCategories = [
@@ -156,6 +157,7 @@ export default function MediaGalleryPage() {
           </div>
         </div>
       </div>
+      <BackToTop/>
     </div>
   );
 }

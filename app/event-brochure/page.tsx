@@ -1,5 +1,6 @@
 "use client";
 
+import BackToTop from "@/components/layout/BackToTop";
 import React, { useState } from "react";
 
 export default function MiningFormPage() {
@@ -137,6 +138,7 @@ export default function MiningFormPage() {
           </form>
         </div>
       </div>
+      <BackToTop/>
     </div>
   );
 }

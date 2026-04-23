@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getArticleBySlug, getAllArticles, getRelatedArticles } from "../data";
+import BackToTop from "@/components/layout/BackToTop";
 
 // Generate static paths for all articles at build time
 export async function generateStaticParams() {
@@ -141,6 +142,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           </div>
         )}
       </article>
+      <BackToTop/>
     </div>
   );
 }

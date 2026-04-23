@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import BackToTop from "@/components/layout/BackToTop";
 
 export default function InsightsPage() {
   const [formData, setFormData] = useState({
@@ -206,6 +207,7 @@ export default function InsightsPage() {
       <div className="text-center py-6 border-t text-gray-400 text-sm">
         © 2025 All Rights Reserved
       </div>
+      <BackToTop/>
     </div>
   );
 }

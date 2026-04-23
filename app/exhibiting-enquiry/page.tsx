@@ -4,6 +4,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import BackToTop from "@/components/layout/BackToTop";
 
 export default function ExhibitingEnquiryPage() {
   const [formData, setFormData] = useState({
@@ -417,6 +418,7 @@ export default function ExhibitingEnquiryPage() {
           </div>
         </div>
       </div>
+      <BackToTop/>
     </div>
   );
 }

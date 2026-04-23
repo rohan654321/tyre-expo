@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import PartnersSection from "@/components/home/PartnersSection";
 import SectorsSection from "@/components/home/SectorsSection";
+import BackToTop from "@/components/layout/BackToTop";
 
 export default function WhyVisitPage() {
   const [loading, setLoading] = useState(true);
@@ -596,6 +597,7 @@ export default function WhyVisitPage() {
 
         {/* Partners Section */}
         <PartnersSection/>
+        <BackToTop/>
       </div>
 
       <style jsx>{`

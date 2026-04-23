@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import PartnersSection from "@/components/home/PartnersSection";
+import BackToTop from "@/components/layout/BackToTop";
 
 export default function PlanYourTravelPage() {
   const [loading, setLoading] = useState(true);
@@ -411,6 +412,7 @@ export default function PlanYourTravelPage() {
           </div>
         </div>
         <hr className="border-t-6 border-[#F08400]" />
+        <BackToTop/>
       </div>
 
       <style jsx>{`

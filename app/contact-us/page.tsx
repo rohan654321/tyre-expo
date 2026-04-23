@@ -1,5 +1,6 @@
 // app/contact-us/page.tsx
 import PartnersSection from "@/components/home/PartnersSection";
+import BackToTop from "@/components/layout/BackToTop";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -153,6 +154,7 @@ export default function ContactUsPage() {
         </div>
       </section>
       <PartnersSection/>
+      <BackToTop/>
 
 
     </main>

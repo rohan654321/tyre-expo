@@ -1,6 +1,7 @@
 // app/post-show-report/page.tsx
 "use client";
 
+import BackToTop from "@/components/layout/BackToTop";
 import Image from "next/image";
 import { useState } from "react";
 
@@ -364,6 +365,7 @@ export default function ReportDownload() {
           </form>
         </div>
       </div>
+      <BackToTop/>
     </div>
   );
 }

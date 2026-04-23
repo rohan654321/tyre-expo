@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import PartnersSection from "@/components/home/PartnersSection";
+import BackToTop from "@/components/layout/BackToTop";
 
 export default function ExhibitorResourceCenterPage() {
   const [loading, setLoading] = useState(true);
@@ -291,6 +292,7 @@ export default function ExhibitorResourceCenterPage() {
         </div>
 
         <PartnersSection />
+        <BackToTop/>
       </div>
 
       <style jsx>{`

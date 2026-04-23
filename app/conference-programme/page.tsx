@@ -10,6 +10,7 @@ import {
   CarouselItem,
 } from "@/components/ui/carousel";
 import PartnersSection from "@/components/home/PartnersSection";
+import BackToTop from "@/components/layout/BackToTop";
 
 // Mock Data (Replace with actual data fetching)
 const statsData = [
@@ -318,6 +319,7 @@ export default function ConferenceProgrammePage() {
         </div>
 
         <PartnersSection />
+        <BackToTop/>
       </div>
     </>
   );

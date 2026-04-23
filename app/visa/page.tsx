@@ -5,6 +5,7 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import PartnersSection from "@/components/home/PartnersSection";
+import BackToTop from "@/components/layout/BackToTop";
 
 // Partners & Sponsors Data
 const partnersSponsors = [
@@ -28,8 +29,8 @@ export default function VisaPage() {
       {/* Official Travel Partner Section */}
       <div className="animated-block">
         <div className="animated-block-target">
-          <div className="container mx-auto px-4 py-16">
-            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+          <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16 py-16 lg:py-20 lg:py-20 lg:py-20">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:gap-10 xl:gap-12">
               {/* Text Card */}
               <div className="bg-gray-100 relative flex min-h-[500px] flex-col p-5 text-black rounded-lg lg:p-10">
                 <div className="z-10 flex flex-col gap-5">
@@ -107,11 +108,11 @@ export default function VisaPage() {
       {/* Invitation for a Visa Section */}
       <div className="animated-block">
         <div className="animated-block-target">
-          <div className="container mx-auto px-4 py-16">
+          <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16 py-16 lg:py-20 lg:py-20 lg:py-20">
             <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold py-10 text-black text-center">
               Invitation for a Visa
             </h2>
-            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:gap-10 xl:gap-12">
               {/* Business Visa Card */}
               <div className="bg-gray-100 relative flex min-h-[500px] flex-col p-5 text-black rounded-lg lg:p-10">
                 <div className="z-10 flex flex-col gap-5">
@@ -237,6 +238,7 @@ export default function VisaPage() {
         </div>
       </div>
       <PartnersSection/>
+      <BackToTop/>
     </div>
   );
 }

@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { getAllArticles, type Article } from "./data";
+import BackToTop from "@/components/layout/BackToTop";
 
 // Get articles from data.ts
 const articlesData = getAllArticles();
@@ -130,6 +131,7 @@ export default function ArticlesPage() {
           </div>
         </div>
       </div>
+      <BackToTop/>
     </div>
   );
 }

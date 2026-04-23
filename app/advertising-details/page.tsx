@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import PartnersSection from "@/components/home/PartnersSection";
+import BackToTop from "@/components/layout/BackToTop";
 
 export default function AdvertisingDetailsPage() {
   const [loading, setLoading] = useState(true);
@@ -249,6 +250,7 @@ export default function AdvertisingDetailsPage() {
         <div className="mt-10">
           <PartnersSection />
         </div>
+        <BackToTop/>
       </div>
 
       <style jsx>{`

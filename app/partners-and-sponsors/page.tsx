@@ -1,6 +1,7 @@
 // app/partners-and-sponsors/page.tsx
 'use client';
 
+import BackToTop from '@/components/layout/BackToTop';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -226,6 +227,7 @@ export default function PartnersSponsorsPage() {
 </div>
 <hr className="border-t-6 border-[#F08400]" />
       </div>
+      <BackToTop/>
     </div>
   );
 }
