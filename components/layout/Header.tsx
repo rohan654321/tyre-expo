@@ -91,7 +91,7 @@ export default function Header() {
 
               {/* ⏱️ Countdown */}
           {/* ⏱️ Countdown */}
-<div className="flex gap-3">
+{/* <div className="flex gap-3">
   {[
     { label: 'Days', value: timeLeft.days },
     { label: 'Hours', value: timeLeft.hours },
@@ -104,16 +104,16 @@ export default function Header() {
   border border-white/10 shadow-md
   transition-all duration-300 
   hover:bg-[#F08400] hover:text-black hover:scale-105"
->
+> */}
   {/* 🌫️ Mist Layer */}
-  <div className="absolute inset-0 pointer-events-none">
+  {/* <div className="absolute inset-0 pointer-events-none">
     <div className="w-full h-full bg-gradient-to-br 
     from-white/10 via-transparent to-white/5 
     opacity-40 blur-xl"></div>
-  </div>
+  </div> */}
 
   {/* Content */}
-  <span className="text-lg font-bold relative z-10">
+  {/* <span className="text-lg font-bold relative z-10">
     {String(item.value).padStart(2, '0')}
   </span>
   <span className="text-xs uppercase tracking-wide relative z-10">
@@ -121,7 +121,7 @@ export default function Header() {
   </span>
 </div>
   ))}
-</div>
+</div> */}
 
               {/* 🔥 Buttons */}
          <div className="flex items-center gap-4">

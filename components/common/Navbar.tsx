@@ -63,6 +63,23 @@ export default function Navbar() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+    const calculateTimeLeft = () => {
+    const targetDate = new Date('2026-04-22T09:00:00').getTime();
+    const now = new Date().getTime();
+    const diff = targetDate - now;
+
+    if (diff <= 0) {
+      return { days: 0, hours: 0, minutes: 0 };
+    }
+
+    return {
+      days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+      hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+      minutes: Math.floor((diff / (1000 * 60)) % 60),
+    };
+  };
+
+  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
 
   return (
     <div className="bg-[#1e1e1e]/80 py-3 text-white">
@@ -136,9 +153,9 @@ export default function Navbar() {
       </div>
 
       {/* 🔥 Floating Exhibitor Login Button - Responsive positioning */}
-      <div className="relative container mx-auto px-4 sm:px-6 lg:px-10">
+      <div className="relative container mx-auto px-6 sm:px-8 lg:px-12">
         <div
-          className={`absolute -bottom-15 z-50 transition-all duration-500 ${
+          className={`absolute -bottom-17 z-50 transition-all duration-500 ${
             isScrolled
               ? 'opacity-0 -translate-y-5 pointer-events-none'
               : 'opacity-100 translate-y-0'
@@ -149,13 +166,58 @@ export default function Navbar() {
         >
           <Link
             href="/exhibitor-login/"
-            className="inline-block bg-[#2A2A2A] text-white px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base shadow-xl border border-white/20 
+            className="inline-block bg-[#2A2A2A] text-white px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base shadow-xl border border-white/20 
             hover:bg-[#F08400] hover:text-black hover:scale-105 transition-all duration-300 whitespace-nowrap"
           >
             Exhibitor Login
           </Link>
         </div>
+      
       </div>
+      <div className="relative container mx-auto px-4 sm:px-8 lg:px-12">
+  <div
+    className={`absolute -bottom-17 z-50 transition-all duration-500 ${
+      isScrolled
+        ? 'opacity-0 -translate-y-5 pointer-events-none'
+        : 'opacity-100 translate-y-0'
+    }`}
+    style={{
+      right: 'clamp(6rem, 12vw, 15rem)' // adjust spacing from right
+    }}
+  >
+    <div className="flex gap-3">
+  {[
+    { label: 'Days', value: timeLeft.days },
+    { label: 'Hours', value: timeLeft.hours },
+    { label: 'Mins', value: timeLeft.minutes },
+  ].map((item, i) => (
+    <div
+      key={i}
+      className="relative overflow-hidden flex flex-col items-center justify-center 
+bg-gray-700/70 backdrop-blur-md px-3 py-1.5 
+border border-white/10 shadow-md
+transition-all duration-300 
+hover:bg-[#F08400] hover:text-black hover:scale-105"
+    >
+      {/* 🌫️ Mist Layer */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="w-full h-full bg-gradient-to-br 
+        from-white/10 via-transparent to-white/5 
+        opacity-40 blur-xl"></div>
+      </div>
+
+      <span className="text-lg font-bold relative z-10">
+        {String(item.value).padStart(2, '0')}
+      </span>
+      <span className="text-xs uppercase tracking-wide relative z-10">
+        {item.label}
+      </span>
+    </div>
+  ))}
+</div>
+  </div>
+</div>
+      
     </div>
   );
 }
