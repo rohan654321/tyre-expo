@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { Button } from '../ui/button';
-import Section from '../ui/section';
+import Container from '../ui/container';
 import StatsGrid from './StatsGrid';
 
 const statsData = [
@@ -12,65 +12,62 @@ const statsData = [
 
 export default function AboutSection() {
   return (
-    <Section className="bg-[#f5f5f5] py-20">
-      <div className="w-full grid grid-cols-1 lg:grid-cols-[40%_60%] items-center gap-10 px-6 md:px-10 lg:px-12"> 
-        {/* LEFT IMAGE */}
-        <div className="w-full  h-[650px]">
-          <Image
-            src="https://cdn.itegroupnews.com/33_1_f4d3f3d85d.jpg"
-            alt="India Tyre Show"
-            width={200}
-            height={500}
-            className="w-full h-full object-cover"
-          />
-        </div>
-
-        {/* RIGHT CONTENT */}
-        <div className="flex flex-col gap-6 w-full ">
-
-          {/* SMALL TITLE */}
-          <p className="text-[#F08400] font-sans text-[14px] font-semibold uppercase tracking-[1.5px]">
-            About India Tyre Show
-          </p>
-
-          {/* BIG HEADING - Extra Bold with Bebas Neue */}
-          <h2 className="font-bebas font-bold text-[8px] sm:text-[24px] lg:text-[38px] xl:text-[48px] leading-[1.15] tracking-[1px] uppercase text-black">
-            POWERING THE FUTURE OF TYRE INDUSTRY
-          </h2>
-
-          {/* DESCRIPTION */}
-          <div className="font-sans text-[16px] sm:text-[18px] text-gray-700 leading-[1.6]  space-y-4">
-            <p className="font-medium">
-              For three decades, India Tyre Show has been the premier international exhibition 
-              for tyre manufacturing and rubber technology. It brings together global tyre professionals, 
-              decision-makers, and innovators to connect, collaborate, and explore the technologies 
-              shaping the future of the industry.
-            </p>
-            <p className="font-medium">
-              Showcasing state-of-the-art equipment, technologies, and services, India Tyre Show helps 
-              companies overcome challenges, expand into key markets, and build lasting partnerships. 
-              Whether you're exploring new opportunities or reinforcing your market presence, 
-              this is where the tyre community meets to advance the industry.
-            </p>
+    <section className="bg-[#f5f5f5] py-20">
+      <Container>
+        <div className="grid grid-cols-1 lg:grid-cols-[40%_60%] items-center gap-10">
+          
+          {/* LEFT IMAGE */}
+          <div className="w-full h-[650px]">
+            <Image
+              src="https://cdn.itegroupnews.com/33_1_f4d3f3d85d.jpg"
+              alt="India Tyre Show"
+              width={200}
+              height={500}
+              className="w-full h-full object-cover"
+            />
           </div>
 
-          {/* STATS */}
-          <div className="mt-4">
-            <StatsGrid stats={statsData} />
-          </div>
+          {/* RIGHT CONTENT */}
+          <div className="flex flex-col gap-6">
+            <p className="text-[#F08400] font-sans text-[14px] font-semibold uppercase tracking-[1.5px]">
+              About India Tyre Show
+            </p>
 
-          {/* BUTTON */}
-          <div className="mt-6">
-            <Button
-              href="/about-indiatyreshow/"
-              className="bg-[#F08400] text-white px-10 py-4 text-sm font-extrabold uppercase tracking-[1.5px] hover:bg-black transition-all duration-300"
-            >
-              Learn More
-            </Button>
+            <h2 className="font-bebas font-bold text-[38px] lg:text-[48px] leading-[1.15] tracking-[1px] uppercase text-black">
+              POWERING THE FUTURE OF TYRE INDUSTRY
+            </h2>
+
+            <div className="font-sans text-[16px] sm:text-[18px] text-gray-700 leading-[1.6] space-y-4">
+              <p className="font-medium">
+                For three decades, India Tyre Show has been the premier international exhibition 
+                for tyre manufacturing and rubber technology. It brings together global tyre professionals, 
+                decision-makers, and innovators to connect, collaborate, and explore the technologies 
+                shaping the future of the industry.
+              </p>
+              <p className="font-medium">
+                Showcasing state-of-the-art equipment, technologies, and services, India Tyre Show helps 
+                companies overcome challenges, expand into key markets, and build lasting partnerships. 
+                Whether you&apos;re exploring new opportunities or reinforcing your market presence, 
+                this is where the tyre community meets to advance the industry.
+              </p>
+            </div>
+
+            <div className="mt-4">
+              <StatsGrid stats={statsData} />
+            </div>
+
+            <div className="mt-6">
+              <Button
+                href="/about-indiatyreshow/"
+                className="bg-[#F08400] text-white px-10 py-4 text-sm font-extrabold uppercase tracking-[1.5px] hover:bg-black transition-all duration-300"
+              >
+                Learn More
+              </Button>
+            </div>
           </div>
 
         </div>
-      </div>
-    </Section>
+      </Container>
+    </section>
   );
 }

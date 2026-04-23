@@ -10,7 +10,6 @@ interface StatsGridProps {
 export default function StatsGrid({ stats }: StatsGridProps) {
   return (
     <div className="mt-10 bg-[#e9e5df] py-16 px-10">
-      
       <div className="grid grid-cols-2 md:grid-cols-4">
         {stats.map((stat, index) => (
           <div
@@ -21,19 +20,15 @@ export default function StatsGrid({ stats }: StatsGridProps) {
               ${index !== stats.length - 1 ? 'md:border-r border-gray-300' : ''}
             `}
           >
-            {/* NUMBER */}
             <h3 className="text-[25px] md:text-[35px] lg:text-[42px] font-bold text-[#F08400] leading-none">
               {stat.number}
             </h3>
-
-            {/* LABEL */}
             <p className="mt-4 text-xs md:text-sm font-semibold text-black uppercase tracking-[2px]">
               {stat.label}
             </p>
           </div>
         ))}
       </div>
-
     </div>
   );
 }

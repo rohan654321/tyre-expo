@@ -64,7 +64,7 @@ export default function HeroSection() {
       </div>
 
       {/* FIXED: Properly aligned container with consistent padding */}
-      <div className="w-full max-w-[1400px] mx-auto px-6 lg:px-16 pb-24">
+      <div className="w-full max-w-[1400px] mx-auto px-6 lg:px-7 pb-24">
         <div className="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-12">
           
           {/* LEFT CONTENT */}
@@ -76,7 +76,7 @@ export default function HeroSection() {
             </h1>
 
             {/* DESCRIPTION */}
-            <p className="mt-6 font-sans text-[16px] sm:text-[18px] lg:text-[20px] text-white/90 leading-[1.5] max-w-3xl">
+            <p className="mt-6 font-sans text-[16px] sm:text-[18px] lg:text-[20px] text-white/90 leading-[1.5] max-w-5xl">
               Celebrating 30 Years of Driving Mining Innovation and Business Growth. 
               MiningWorld Russia unites equipment manufacturers, technology pioneers, 
               and buyers from across the CIS to accelerate the future of mining and mineral processing.
