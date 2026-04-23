@@ -48,7 +48,7 @@ export default function HeroSection() {
                   className="object-cover"
                   priority={index === 0}
                   onError={() => handleImageError(slide.id)}
-                  unoptimized // Bypass Next.js image optimization for external URLs
+                  unoptimized
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-orange-800 to-black">
@@ -62,45 +62,38 @@ export default function HeroSection() {
           ))}
         </div>
       </div>
-      <div className="w-full flex flex-col lg:flex-row items-end justify-between pb-24 gap-12 px-6 lg:px-16">
 
-  {/* LEFT CONTENT */}
-  <div className="max-w-8xl">
-    
-    {/* BIG HEADING */}
-<h1
-  className="
-    font-heading
-    uppercase
-    text-[120px]
-    leading-[0.75]
-    tracking-[2px]
-  "
->
-  <span className="text-white">MINING WORLD</span>{' '}
-  <span className="text-[#F08400]">2026</span>
-</h1>
+      {/* FIXED: Properly aligned container with consistent padding */}
+      <div className="w-full max-w-[1400px] mx-auto px-6 lg:px-16 pb-24">
+        <div className="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-12">
+          
+          {/* LEFT CONTENT */}
+          <div className="flex-1">
+            {/* BIG HEADING */}
+            <h1 className="font-heading uppercase text-[80px] sm:text-[100px] lg:text-[120px] leading-[0.85] lg:leading-[0.75] tracking-[2px]">
+              <span className="text-white">MINING WORLD</span>{' '}
+              <span className="text-[#F08400]">2026</span>
+            </h1>
 
-    {/* DESCRIPTION */}
-<p className="mt-6 font-sans text-[16px] sm:text-[18px] lg:text-[20px] 
-text-white/90 leading-[1.5] max-w-7xl">
-  Celebrating 30 Years of Driving Mining Innovation and Business Growth. 
-  MiningWorld Russia unites equipment manufacturers, technology pioneers, 
-  and buyers from across the CIS to accelerate the future of mining and mineral processing.
-</p>
-  </div>
+            {/* DESCRIPTION */}
+            <p className="mt-6 font-sans text-[16px] sm:text-[18px] lg:text-[20px] text-white/90 leading-[1.5] max-w-3xl">
+              Celebrating 30 Years of Driving Mining Innovation and Business Growth. 
+              MiningWorld Russia unites equipment manufacturers, technology pioneers, 
+              and buyers from across the CIS to accelerate the future of mining and mineral processing.
+            </p>
+          </div>
 
-  {/* RIGHT BUTTON */}
-  <div className="flex-shrink-0">
-    <Link
-      href="/exhibiting-enquiry/"
-      className="bg-[#F08400] px-10 py-4 text-sm font-semibold uppercase tracking-[1.5px] hover:bg-orange-600 transition-all duration-300"
-    >
-      Exhibit
-    </Link>
-  </div>
-</div>
-
+          {/* RIGHT BUTTON - Aligned to bottom on large screens */}
+          <div className="flex-shrink-0 lg:self-end">
+            <Link
+              href="/exhibiting-enquiry/"
+              className="inline-block bg-[#F08400] px-10 py-4 text-sm font-semibold uppercase tracking-[1.5px] hover:bg-orange-600 transition-all duration-300 whitespace-nowrap"
+            >
+              Exhibit
+            </Link>
+          </div>
+        </div>
+      </div>
     </section>
   );
 }
