@@ -113,11 +113,11 @@ export default function AboutPage() {
   ];
 
   const quickLinks = [
-    { label: "Enquire to Exhibit", link: "/exhibiting-enquiry", icon: "/icons/enquire.png" },
-    { label: "Download Event Brochure", link: "/event-brochure", icon: "/icons/brochure.png" },
-    { label: "Exhibitor List", link: "/exhibitor-list", icon: "/icons/list.png" },
-    { label: "Plan Your Travel", link: "/plan-your-travel", icon: "/icons/travel.png" },
-    { label: "Why Visit", link: "/why-visit", icon: "/icons/visit.png" }
+    { label: "Enquire to Exhibit", link: "/exhibiting-enquiry", icon: "https://cdn.itegroupnews.com/Vector_1_440f5852b9.png" },
+    { label: "Download Event Brochure", link: "/event-brochure", icon: "https://cdn.itegroupnews.com/Group_e024d13500.png" },
+    { label: "Exhibitor List", link: "/exhibitor-list", icon: "https://cdn.itegroupnews.com/Vector_ceea3d1488.png" },
+    { label: "Plan Your Travel", link: "/plan-your-travel", icon: "https://cdn.itegroupnews.com/Vector_1_b2c1ab92d0.png" },
+    { label: "Why Visit", link: "/why-visit", icon: "https://cdn.itegroupnews.com/Vector_2_9be2b98909.png" }
   ];
 
   return (
@@ -431,9 +431,15 @@ export default function AboutPage() {
                         <Link href={item.link} className="flex flex-col items-center">
 
                           {/* ICON CIRCLE */}
-                          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gray-800">
-                            <div className="h-8 w-8 bg-orange-500 rounded-sm"></div>
-                          </div>
+                          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gray-800 overflow-hidden">
+  <Image
+    src={item.icon}
+    alt={item.label}
+    width={32}
+    height={32}
+    className="object-contain"
+  />
+</div>
 
                           {/* LABEL */}
                           <p className="mt-4 text-sm font-semibold text-gray-300">

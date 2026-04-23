@@ -130,7 +130,7 @@ export default function ExhibitorResourceCenterPage() {
         {/* Explore Opportunities Section */}
         <div className="animated-block">
           <div className="animated-block-target">
-            <div className="container mx-auto grid items-center gap-10 px-4 lg:grid-cols-5 lg:gap-20">
+            <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto grid items-center gap-10 px-6 sm:px-8 lg:px-12 xl:px-16 lg:grid-cols-5 lg:gap-20">
               <div className="lg:col-span-3">
                 <div className="flex flex-col gap-5">
                   <h2 className="font-bebas text-5xl text-black md:text-6xl lg:text-7xl">Explore Opportunities</h2>
@@ -163,7 +163,7 @@ export default function ExhibitorResourceCenterPage() {
         {/* Stands for Business Objectives Section */}
         <div className="animated-block mt-20">
           <div className="animated-block-target">
-            <div className="container mx-auto px-4">
+            <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
               <div className="text-center lg:text-left">
                 <h2 className="font-bebas text-5xl text-black md:text-6xl lg:text-7xl">
                   Stands for your <span className="text-[#F08400]">Business Objectives</span>
@@ -202,7 +202,7 @@ export default function ExhibitorResourceCenterPage() {
         {/* Explore Stand Options Section */}
         <div className="animated-block mt-12 lg:mt-20">
           <div className="animated-block-target">
-            <div className="container mx-auto px-4">
+            <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
               <div className="mb-10 text-center lg:mb-12 lg:text-left">
                 <h3 className="font-bebas text-5xl text-black md:text-6xl lg:text-7xl">
                   Explore Our <span className="text-[#F08400]">Stand Options</span>
@@ -250,7 +250,7 @@ export default function ExhibitorResourceCenterPage() {
         <div className="animated-block mt-12 lg:mt-20">
           <div className="animated-block-target">
             <div className="bg-gray-50 py-16 lg:py-20">
-              <div className="container mx-auto px-4">
+              <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
                 <h2 className="mb-8 font-bebas text-5xl text-black md:text-6xl lg:text-7xl">
                   Exhibition <span className="text-[#F08400]">Guide</span>
                 </h2>

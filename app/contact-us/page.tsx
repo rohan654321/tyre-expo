@@ -10,7 +10,7 @@ export default function ContactUsPage() {
 
       {/* Main Contact Section */}
       <section className="relative py-16 font-parabolica">
-        <div className="w-full px-4 sm:px-6 lg:px-8 mx-auto max-w-[1240px] lg:max-w-[1320px] xl:max-w-[1440px] 2xl:max-w-[1600px]">
+        <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
           <div className="mb-12 text-center">
             <p className="mx-auto max-w-2xl text-lg text-gray-700">
               Have questions or need help? Contact us using the details below.

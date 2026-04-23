@@ -131,7 +131,7 @@ export default function AdvertisingDetailsPage() {
         {/* Header Section */}
         <div className="animated-block">
           <div className="animated-block-target">
-            <div className="container mx-auto px-4 py-10">
+            <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16 py-10">
               <div className="text-center lg:text-left">
                 <h1 className="font-bebas text-5xl text-black md:text-6xl lg:text-7xl">
                   Advertising & <span className="text-[#F08400]">Sponsorship</span>
@@ -148,14 +148,14 @@ export default function AdvertisingDetailsPage() {
         {/* Benefits Section */}
         <div className="animated-block mt-10">
           <div className="animated-block-target">
-            <div className="container mx-auto px-4">
+            <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
               <div className="text-center lg:text-left">
                 <h2 className="font-bebas text-5xl text-black md:text-6xl lg:text-7xl">
                   By leveraging these promotional options, you can:
                 </h2>
                 <p className="mt-3 text-lg text-gray-600">Please review the requirements carefully to ensure timely submission.</p>
               </div>
-              <div className="my-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="my-14 grid gap-10 lg:gap-14 xl:gap-16 sm:grid-cols-2 lg:grid-cols-3">
                 {benefits.map((benefit, idx) => (
                   <div key={idx} className="flex flex-col gap-4 rounded-lg p-6 transition-all hover:shadow-lg">
                     <div className="flex h-16 w-16 items-center justify-center overflow-hidden">
@@ -188,7 +188,7 @@ export default function AdvertisingDetailsPage() {
         {/* Advertising & Sponsorship Options Section */}
         <div className="animated-block mt-10">
           <div className="animated-block-target">
-            <div className="container mx-auto px-4 py-10">
+            <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16 py-10">
               <div className="mb-10 border-b border-gray-200 pb-10">
                 <h3 className="font-bebas text-5xl text-black md:text-6xl lg:text-7xl">
                   Advertising & <span className="text-[#F08400]">Sponsorship Options</span>

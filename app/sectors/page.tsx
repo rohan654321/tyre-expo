@@ -153,7 +153,7 @@ export default function SectorsPage() {
         {/* Sectors Grid Section */}
         <div className="animated-block">
           <div className="animated-block-target">
-            <div className="container mx-auto px-4">
+            <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
               {/* Header Section */}
               <div className="text-center lg:text-left">
                 <h2 className="font-bebas text-5xl text-black md:text-6xl lg:text-7xl">
@@ -216,7 +216,7 @@ export default function SectorsPage() {
         {/* Quick Guide Section - Only button position changed */}
         <div className="animated-block mt-12 lg:mt-20">
           <div className="animated-block-target">
-            <div className="container mx-auto px-4">
+            <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
               {/* Quick Guide Header */}
               <div className="mb-10 text-center lg:mb-12 lg:text-left">
                 <p className="font-bold text-[#F08400]">Quick Guide</p>

@@ -86,7 +86,7 @@ function HeroSection() {
             </div>
 
             <div className="relative z-20 flex min-h-[50vh] lg:min-h-[60vh] w-full items-center px-4 sm:px-6 lg:px-8">
-                <div className="mx-auto w-full max-w-[1440px]">
+                <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
                     <div className="max-w-3xl">
                         <div className="inline-block px-4 py-2 bg-[#F08400]/20 backdrop-blur-sm rounded-lg mb-4">
                             <span className="text-[#F08400] font-semibold">
@@ -135,7 +135,7 @@ function AboutSection() {
 
     return (
         <section className="py-20 lg:py-28 bg-white">
-            <div className="container mx-auto px-4 max-w-[1440px]">
+            <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
                 <div className="grid lg:grid-cols-2 gap-12 items-center">
                     <div>
                         <div className="inline-block px-4 py-2 bg-[#F08400]/10 rounded-lg mb-6">
@@ -236,7 +236,7 @@ function SpeakersSection() {
 
     return (
         <section className="py-20 lg:py-28 bg-gradient-to-br from-gray-50 to-white">
-            <div className="container mx-auto px-4 max-w-[1440px]">
+            <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
 
                 {/* Header */}
                 <div className="text-center mb-12">
@@ -332,7 +332,7 @@ function ConferenceProgramme() {
 
     return (
         <section className="py-20 lg:py-28 bg-white">
-            <div className="container mx-auto px-4 max-w-[1440px]">
+            <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
                 <div className="text-center mb-12">
                     <div className="inline-block px-4 py-2 bg-[#F08400]/10 rounded-lg mb-4">
                         <span className="text-[#F08400] font-semibold">SCHEDULE</span>
@@ -417,7 +417,7 @@ function WhyAttendSection() {
 
     return (
         <section className="py-20 lg:py-28 bg-gradient-to-br from-gray-50 to-white">
-            <div className="container mx-auto px-4 max-w-[1440px]">
+            <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
                 <div className="text-center mb-12">
                     <div className="inline-block px-4 py-2 bg-[#F08400]/10 rounded-lg mb-4">
                         <span className="text-[#F08400] font-semibold">WHY ATTEND</span>
@@ -445,7 +445,7 @@ function WhyAttendSection() {
 function VenueSection() {
     return (
         <section className="py-20 lg:py-28 bg-white">
-            <div className="container mx-auto px-4 max-w-[1440px]">
+            <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
                 <div className="grid lg:grid-cols-2 gap-12 items-center">
                     <div>
                         <div className="inline-block px-4 py-2 bg-[#F08400]/10 rounded-lg mb-4">
@@ -502,7 +502,7 @@ function VenueSection() {
 function OrganizerSection() {
     return (
         <section className="py-20 lg:py-28 bg-gradient-to-br from-gray-50 to-white">
-            <div className="container mx-auto px-4 max-w-[1440px]">
+            <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
                 <div className="text-center mb-12">
                     <div className="inline-block px-4 py-2 bg-[#F08400]/10 rounded-lg mb-4">
                         <span className="text-[#F08400] font-semibold">ORGANIZER</span>
@@ -540,7 +540,7 @@ function FAQ() {
 
     return (
         <section className="py-20 lg:py-28 bg-white">
-            <div className="container mx-auto px-4 max-w-[1440px]">
+            <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
                 <div className="text-center mb-12">
                     <div className="inline-block px-4 py-2 bg-[#F08400]/10 rounded-lg mb-4">
                         <span className="text-[#F08400] font-semibold">FAQ</span>
@@ -582,7 +582,7 @@ function FAQ() {
 function Contacts() {
     return (
         <section className="py-20 lg:py-28 bg-gradient-to-br from-[#F08400]/5 to-white">
-            <div className="container mx-auto px-4 max-w-[1440px]">
+            <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
                 <div className="text-center mb-12">
                     <div className="inline-block px-4 py-2 bg-[#F08400]/10 rounded-lg mb-4">
                         <span className="text-[#F08400] font-semibold">GET IN TOUCH</span>
@@ -625,7 +625,7 @@ function BecomeDelegate() {
 
     return (
         <section className="py-20 lg:py-28 bg-white">
-            <div className="container mx-auto px-4 max-w-[1440px]">
+            <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
                 <div className="text-center mb-12">
                     <div className="inline-block px-4 py-2 bg-[#F08400]/10 rounded-lg mb-4">
                         <span className="text-[#F08400] font-semibold">REGISTRATION</span>

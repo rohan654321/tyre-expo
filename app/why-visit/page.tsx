@@ -189,7 +189,7 @@ export default function WhyVisitPage() {
         {/* Heart of Industry Section */}
         <div className="animated-block">
           <div className="animated-block-target">
-            <div className="container mx-auto grid items-center gap-10 overflow-hidden px-4 lg:grid-cols-5 lg:gap-20">
+            <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto grid items-center gap-10 overflow-hidden px-6 sm:px-8 lg:grid-cols-5 lg:gap-20">
               <div className="lg:col-span-3">
                 <div className="flex flex-col gap-5">
                   <h2 className="font-bebas text-5xl text-black md:text-6xl">The Heart of the Tyre Manufacturing Industry</h2>
@@ -239,7 +239,7 @@ export default function WhyVisitPage() {
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/50"></div>
 
-      <div className="container relative z-10 px-10">
+      <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] relative z-10 mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
         <div className="grid gap-5">
 
           <p className="font-bold text-[#F08400]">
@@ -338,7 +338,7 @@ export default function WhyVisitPage() {
                 <div className="absolute inset-0 bg-black/60"></div>
 
                 {/* CONTENT */}
-                <div className="container relative z-10 mx-auto px-4">
+                <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] relative z-10 mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
                   <div className="grid items-center gap-10 md:grid-cols-12">
 
                     {/* LEFT IMAGE / MOCKUP */}
@@ -378,7 +378,7 @@ export default function WhyVisitPage() {
         {/* Business Areas Section */}
         <div className="animated-block mt-20">
           <div className="animated-block-target">
-            <div className="container mx-auto grid items-center gap-10 overflow-hidden px-4 lg:grid-cols-5 lg:gap-20">
+            <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto grid items-center gap-10 overflow-hidden px-6 sm:px-8 lg:grid-cols-5 lg:gap-20">
               <div className="lg:col-span-3">
                 <div className="flex flex-col gap-5">
                   <h3 className="font-bebas text-5xl text-black md:text-6xl">Discover the Key Business Areas of Our Attendees</h3>
@@ -417,7 +417,7 @@ export default function WhyVisitPage() {
         {/* Who is it for Section */}
 <div className="animated-block mt-20">
   <div className="animated-block-target">
-    <div className="container mx-auto px-4">
+    <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
 
       <h3 className="font-bebas text-5xl text-black md:text-6xl">
         Who is ITS Tyre Expo for?
@@ -465,9 +465,9 @@ export default function WhyVisitPage() {
 </div>
 
         {/* Past Exhibitors Section */}
-        <div className="animated-block mt-20">
+        <div className="animated-block mt-20 mb-10">
           <div className="animated-block-target">
-            <div className="container mx-auto px-4">
+            <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
               <h3 className="font-bebas text-5xl text-black md:text-6xl">Have a Look at Our Past Exhibitors</h3>
               <div className="mt-10 rounded-lg bg-[#F08400]/10 p-8">
                <div className="mt-10 overflow-hidden rounded-lg">
@@ -493,7 +493,7 @@ export default function WhyVisitPage() {
         {/* Beyond an Exhibition Section */}
         <div className="animated-block mt-20">
           <div className="animated-block-target">
-            <div className="container mx-auto px-4">
+            <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
               <div className="mb-5 flex justify-between lg:items-end">
                 <div className="lg:basis-2/3">
                   <h3 className="font-bebas text-5xl text-black md:text-6xl">Beyond an Exhibition</h3>
@@ -530,7 +530,7 @@ export default function WhyVisitPage() {
         {/* When and Where Section */}
         <div className="animated-block mt-20">
           <div className="animated-block-target">
-            <div className="container mx-auto flex flex-col gap-6 px-4 text-black">
+            <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto flex flex-col gap-6 px-6 sm:px-8 lg:px-12 xl:px-16 text-black">
               <h3 className="font-bebas text-5xl text-black md:text-6xl">When and Where</h3>
               <div className="grid gap-6 lg:grid-cols-2">
                 <div className="rounded-xl bg-[#F08400]/10 p-6">
@@ -563,7 +563,7 @@ export default function WhyVisitPage() {
         <div className="animated-block mt-20">
           <div className="animated-block-target">
             <div className="-mt-px border-t-8 border-[#F08400] bg-black py-20 text-white">
-              <div className="container relative z-1 mx-auto w-full space-y-8 overflow-hidden px-4">
+              <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] relative z-1 mx-auto w-full space-y-8 overflow-hidden px-6 sm:px-8 lg:px-12 xl:px-16">
                 <h2 className="font-bebas text-6xl md:text-7xl">Quick Navigation</h2>
                <div className="mt-12 grid grid-cols-2 gap-y-10 text-center md:grid-cols-4">
 

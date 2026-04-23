@@ -121,7 +121,7 @@ export default function WhyExhibitPage() {
           {/* Powering Progress Section */}
           <div className="animated-block">
             <div className="animated-block-target">
-              <div className="container relative z-1 mx-auto grid items-center gap-10 overflow-hidden px-4 lg:grid-cols-5 lg:gap-20">
+              <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto grid items-center gap-10 overflow-hidden px-6 sm:px-8 lg:grid-cols-5 lg:gap-20">
                 <div className="lg:col-span-5">
                   <div className="flex flex-col gap-5">
                     <p className="font-bold text-[#F08400]">Your Gateway to Tyre Manufacturing Growth in ASEAN</p>
@@ -161,7 +161,7 @@ export default function WhyExhibitPage() {
           {/* Why Exhibit Section */}
           <div className="animated-block mt-20">
             <div className="animated-block-target">
-              <div className="container mx-auto px-4">
+              <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
                 <div className="grid gap-5">
                   <h2 className="font-bebas text-6xl text-black md:text-7xl">Why Exhibit at ITS Tyre Expo</h2>
                   <p className="text-lg text-gray-700">
@@ -219,7 +219,7 @@ export default function WhyExhibitPage() {
           {/* Visitor Breakdown Section */}
           <div className="animated-block mt-20">
             <div className="animated-block-target">
-              <div className="container mx-auto grid items-center gap-10 overflow-hidden px-4 lg:grid-cols-5 lg:gap-20">
+              <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto grid items-center gap-10 overflow-hidden px-6 sm:px-8 lg:grid-cols-5 lg:gap-20">
                 <div className="lg:col-span-3">
                   <div className="flex flex-col gap-5">
                     <p className="font-bold text-orange-600">Visitor Breakdown</p>
@@ -284,7 +284,7 @@ export default function WhyExhibitPage() {
                 <div className="absolute inset-0 bg-black/60"></div>
 
                 {/* CONTENT */}
-                <div className="container relative z-10 mx-auto px-4">
+                <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] relative z-10 mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
                   <div className="grid items-center gap-10 md:grid-cols-12">
 
                     {/* LEFT IMAGE / MOCKUP */}
@@ -325,7 +325,7 @@ export default function WhyExhibitPage() {
           {/* Why ASEAN Section */}
           <div className="animated-block mt-20">
             <div className="animated-block-target">
-              <div className="container mx-auto px-4">
+              <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
                 <h2 className="mb-10 font-bebas text-6xl text-black md:text-7xl">Why Southeast Asia?</h2>
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                   {[
@@ -387,7 +387,7 @@ export default function WhyExhibitPage() {
           {/* Testimonials Section */}
           <div className="animated-block mt-20">
             <div className="animated-block-target">
-              <div className="container relative mx-auto px-4">
+              <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] relative mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
                 <div className="mb-10 flex justify-between max-lg:flex-col lg:items-end">
                   <div className="lg:basis-2/3">
                     <p className="font-bold text-[#F08400]">Testimonials</p>
@@ -422,7 +422,7 @@ export default function WhyExhibitPage() {
           {/* When and Where Section */}
           <div className="animated-block mt-20">
             <div className="animated-block-target">
-              <div className="container mx-auto px-4 text-black">
+              <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16 text-black">
 
                 {/* HEADING */}
                 <h2 className="mb-10 font-bebas text-6xl md:text-7xl">
@@ -481,7 +481,7 @@ export default function WhyExhibitPage() {
           <div className="animated-block mt-20">
             <div className="animated-block-target">
               <div className="border-t-8 border-orange-600 bg-black py-20 text-white">
-                <div className="container mx-auto px-4">
+                <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
                   <h2 className="font-bebas text-6xl md:text-7xl">Quick Navigation</h2>
                   <div className="mt-16 grid grid-cols-2 gap-y-10 md:grid-cols-5">
                     {quickLinks.map((item, idx) => (

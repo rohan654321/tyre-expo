@@ -243,7 +243,7 @@ export default function PlanYourTravelPage() {
         {/* Culture Section */}
         <div className="animated-block">
           <div className="animated-block-target">
-            <div className="container mx-auto px-4 py-10">
+            <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16 py-10">
               <div className="mb-5 flex justify-between lg:items-end">
                 <div className="lg:basis-2/3">
                   <h3 className="font-bebas text-5xl text-black md:text-6xl">Blend business opportunity and Bangkok's vibrant culture when you visit ITS Tyre Expo</h3>
@@ -259,7 +259,7 @@ export default function PlanYourTravelPage() {
         {/* Travel Information Tabs */}
         <div className="animated-block">
           <div className="animated-block-target">
-            <div className="container mx-auto px-4 py-10">
+            <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16 py-10">
               <div className="flex-between mb-10 flex-wrap items-end gap-5 border-b border-gray-300 pb-10">
                 <div>
                   <h4 className="font-bebas text-5xl text-black md:text-6xl">The information you need before traveling</h4>
@@ -344,7 +344,7 @@ export default function PlanYourTravelPage() {
         {/* Hotels Section */}
         <div className="animated-block">
           <div className="animated-block-target">
-            <div className="container mx-auto px-4">
+            <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
               <h3 className="font-bebas text-5xl text-black md:text-6xl">20% off when you book at the hotel website using the promo code "EXPO"</h3>
               <div className="mt-5 h-px w-full bg-[#F08400]"></div>
 
@@ -385,7 +385,7 @@ export default function PlanYourTravelPage() {
         <div className="animated-block mt-20">
           <div className="animated-block-target">
             <div className="border-t-8 border-orange-600 bg-black py-20 text-white">
-              <div className="container mx-auto px-4">
+              <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
                 <h2 className="font-bebas text-6xl md:text-7xl">Quick Navigation</h2>
                 <div className="mt-16 grid grid-cols-2 gap-y-10 md:grid-cols-5">
                   {quickLinks.map((item, idx) => (

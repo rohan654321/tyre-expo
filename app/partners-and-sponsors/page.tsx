@@ -84,12 +84,12 @@ export default function PartnersSponsorsPage() {
   ];
 
   // Quick links data
-  const quickLinks = [
-    { label: "Enquire to Exhibit", link: "/exhibiting-enquiry", icon: "/icons/enquire.png" },
-    { label: "Download Event Brochure", link: "/event-brochure", icon: "/icons/brochure.png" },
-    { label: "Exhibitor List", link: "/exhibitor-list", icon: "/icons/list.png" },
-    { label: "Plan Your Travel", link: "/plan-your-travel", icon: "/icons/travel.png" },
-    { label: "Why Visit", link: "/why-visit", icon: "/icons/visit.png" }
+   const quickLinks = [
+    { label: "Enquire to Exhibit", link: "/exhibiting-enquiry", icon: "https://cdn.itegroupnews.com/Vector_1_440f5852b9.png" },
+    { label: "Download Event Brochure", link: "/event-brochure", icon: "https://cdn.itegroupnews.com/Group_e024d13500.png" },
+    { label: "Exhibitor List", link: "/exhibitor-list", icon: "https://cdn.itegroupnews.com/Vector_ceea3d1488.png" },
+    { label: "Plan Your Travel", link: "/plan-your-travel", icon: "https://cdn.itegroupnews.com/Vector_1_b2c1ab92d0.png" },
+    { label: "Why Visit", link: "/why-visit", icon: "https://cdn.itegroupnews.com/Vector_2_9be2b98909.png" }
   ];
 
   return (
@@ -99,7 +99,7 @@ export default function PartnersSponsorsPage() {
         
         {/* Event Partners Section */}
         <section className="py-16 lg:py-20">
-          <div className="container mx-auto px-4">
+          <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
             <h2 className="font-bebas text-5xl text-black md:text-6xl text-center mb-10 lg:mb-16">
               Event Partners
             </h2>
@@ -136,7 +136,7 @@ export default function PartnersSponsorsPage() {
 
         {/* Media Partners Section */}
         <section className="py-16 lg:py-20 bg-orange-50">
-          <div className="container mx-auto px-4">
+          <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
             <h2 className="font-bebas text-5xl text-black md:text-6xl text-center mb-10 lg:mb-16">
               Media Partners
             </h2>
@@ -178,7 +178,7 @@ export default function PartnersSponsorsPage() {
   <div className="animated-block-target">
     <div className="border-t-8 border-orange-600 bg-black py-20 text-white">
       
-      <div className="container mx-auto px-4">
+      <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
         
         {/* HEADING */}
         <h2 className="font-bebas text-6xl md:text-7xl">
@@ -199,8 +199,14 @@ export default function PartnersSponsorsPage() {
               <Link href={item.link} className="flex flex-col items-center">
                 
                 {/* ICON CIRCLE */}
-                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gray-800">
-                  <div className="h-8 w-8 bg-orange-500 rounded-sm"></div>
+                                          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gray-800 overflow-hidden">
+                  <Image
+                    src={item.icon}
+                    alt={item.label}
+                    width={32}
+                    height={32}
+                    className="object-contain"
+                  />
                 </div>
 
                 {/* LABEL */}

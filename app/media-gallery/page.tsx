@@ -119,7 +119,7 @@ export default function MediaGalleryPage() {
       {/* Gallery Grid Section */}
       <div className="animated-block">
         <div className="animated-block-target">
-          <div className="container mx-auto px-4 py-16">
+          <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16 py-16">
             <div className="mb-10 max-w-3xl space-y-5 lg:mb-20">
               <h4 className="title-70 text-black lg:basis-2/3">
                 A Visual Journey Through Mining World
@@ -130,7 +130,7 @@ export default function MediaGalleryPage() {
               </div>
             </div>
 
-            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:gap-8 2xl:gap-10">
               {galleryCategories.map((category) => (
                 <Link
                   key={category.id}

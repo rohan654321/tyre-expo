@@ -6,24 +6,25 @@ export default function Footer() {
   return (
     <footer className="bg-black text-gray-400">
       {/* Top Section */}
-      <Container className="py-14">
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
+      <Container className="py-16 lg:py-20">
+        <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4 xl:gap-20">
           
           {/* Logo */}
-          <div>
-            <Image
-              src="/ITS_logoWhite.png"
-              alt="MiningWorld Russia"
-              width={100}
-              height={60}
-              className="object-contain"
-            />
-          </div>
+          <div className="space-y-4">
+  <Image
+    src="/ITS_logoWhite.png"
+    alt="MiningWorld Russia"
+    width={280}
+    height={80}
+    className="object-contain"
+  />
 
+
+</div>
           {/* Contacts */}
           <div className="space-y-6">
             <div>
-              <h5 className="text-sm font-semibold uppercase tracking-wide text-white mb-2">
+              <h5 className="text-xs font-bold uppercase tracking-wider text-white mb-2">
                 Contacts and Support
               </h5>
               <a
@@ -35,7 +36,7 @@ export default function Footer() {
             </div>
 
             <div>
-              <h5 className="text-sm font-semibold uppercase tracking-wide text-white mb-2">
+              <h5 className="text-xs font-bold uppercase tracking-wider text-white mb-2">
                 Hotline
               </h5>
               <a href="tel:+74957995585" className="hover:text-white">
@@ -44,7 +45,7 @@ export default function Footer() {
             </div>
 
             <div>
-              <h5 className="text-sm font-semibold uppercase tracking-wide text-white mb-2">
+              <h5 className="text-xs font-bold uppercase tracking-wider text-white mb-2">
                 Visitor Support
               </h5>
               <a href="tel:+74957995585" className="hover:text-white">
@@ -55,7 +56,7 @@ export default function Footer() {
 
           {/* Opening Hours */}
           <div>
-            <h5 className="text-sm font-semibold uppercase tracking-wide text-white mb-3">
+            <h5 className="text-xs font-bold uppercase tracking-wider text-white mb-3">
               Opening Hours
             </h5>
             <div className="space-y-1">
@@ -67,7 +68,7 @@ export default function Footer() {
 
           {/* Venue */}
           <div>
-            <h5 className="text-sm font-semibold uppercase tracking-wide text-white mb-3">
+            <h5 className="text-xs font-bold uppercase tracking-wider text-white mb-3">
               Exhibition Venue
             </h5>
             <p>
@@ -97,7 +98,7 @@ export default function Footer() {
 
       {/* Bottom Section */}
       <Container>
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 border-t border-[#F08400] py-6">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 border-t border-[#F08400] py-8">
           {/* Left */}
           <div className="flex items-center gap-2">
             <span className="text-sm">Organised By</span>

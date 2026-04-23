@@ -47,7 +47,7 @@ export default function ArticlesPage() {
       {/* Articles Grid Section */}
       <div className="animated-block">
         <div className="animated-block-target">
-          <div className="container mx-auto px-4 py-16">
+          <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16 py-16">
           
 
             {/* Articles Grid */}
