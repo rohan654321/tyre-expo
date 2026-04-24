@@ -115,7 +115,7 @@ export default function RequirementsPage() {
 
   // Handle New Requirement - Open category selection modal or navigate to selection page
   const handleNewRequirement = () => {
-    router.push('/dashboard/requirements/new');
+    router.push('/dashboard/requirements/wizard');
   };
 
   return (
