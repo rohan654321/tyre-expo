@@ -160,7 +160,7 @@ export default function SectorsPage() {
                 <h2 className="font-bebas text-5xl text-black md:text-6xl lg:text-7xl">
                   Sectors Showcased at <span className="text-[#F08400]">ITS Tyre Expo</span>
                 </h2>
-                <p className="mx-auto mt-5 max-w-4xl text-lg text-gray-700 lg:mx-0">
+                <p className="mx-auto mt-5 max-w-9xl text-lg text-gray-700 lg:mx-0">
                   The event highlights key sectors including raw materials, tyre manufacturing machinery, 
                   testing equipment, and automation technologies tailored for the tyre industry. Whether 
                   you're seeking innovative solutions for rubber processing, cutting-edge machinery, or 

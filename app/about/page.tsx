@@ -318,7 +318,7 @@ export default function AboutPage() {
                   {/* BUTTON */}
                   <div className="mt-8 flex justify-start">
                     <Link
-                      href="https://catalogue.ite-expo.ru/en-GB/exhibitorlist.aspx?project_id=522"
+                      href="/exhibition-directory"
                       target="_blank"
                     >
                       <button className="bg-[#F08400] px-8 py-3 font-bebas text-xl text-white transition-all hover:bg-black">
