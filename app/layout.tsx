@@ -1,6 +1,8 @@
-import type { Metadata } from "next";
+"use client";
+// import type { Metadata } from "next";
 import { Bebas_Neue, Roboto } from "next/font/google";
 import "./globals.css";
+import { usePathname } from "next/navigation";
 
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -17,16 +19,18 @@ const roboto = Roboto({
   variable: "--font-sans",
 });
 
-export const metadata: Metadata = {
-  title: "ITS TYRE EXPO",
-  description: "Expo Website",
-};
+// export const metadata: Metadata = {
+//   title: "ITS TYRE EXPO",
+//   description: "Expo Website",
+// };
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+  const hideHeaderFooter = pathname.startsWith("/dashboard") || pathname.startsWith("/register");
   return (
     <html
       lang="en"
@@ -39,12 +43,12 @@ export default function RootLayout({
 
         {/* ✅ IMPORTANT: spacing for fixed header */}
        
-           <Header />
+           {!hideHeaderFooter && <Header />}
           {children}
       
 
         {/* ✅ Footer */}
-        <Footer />
+        {!hideHeaderFooter && <Footer />}
 
       </body>
     </html>

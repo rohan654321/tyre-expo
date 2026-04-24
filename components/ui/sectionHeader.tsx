@@ -1,13 +1,15 @@
+// components/ui/sectionHeader.tsx
+
 interface SectionHeaderProps {
-  topText?: string;
   title: string;
+  topText?: string;
   description?: string;
   align?: 'left' | 'center';
 }
 
 export default function SectionHeader({
-  topText,
   title,
+  topText,
   description,
   align = 'left',
 }: SectionHeaderProps) {
@@ -15,7 +17,6 @@ export default function SectionHeader({
 
   return (
     <div className={`mb-12 ${isCenter ? 'text-center' : 'text-left'}`}>
-
       {/* TOP TEXT */}
       {topText && (
         <p className="text-[#F08400] font-sans text-[14px] uppercase tracking-[1.5px]">
@@ -24,15 +25,19 @@ export default function SectionHeader({
       )}
 
       {/* TITLE */}
-      <h2 className="font-bebas font-bold  text-[52px] md:text-[70px] uppercase tracking-[1.5px] text-[#1a1a1a] leading-[1.05] mt-3">
+      <h2 
+        className={`font-bebas font-bold text-[46px] md:text-[70px] uppercase tracking-[2px] text-black leading-[1.05] ${
+          topText ? 'mt-3' : ''
+        }`}
+      >
         {title}
       </h2>
 
       {/* DESCRIPTION */}
       {description && (
-        <p
-          className={`text-gray-600 mt-6 text-lg leading-relaxed ${
-            isCenter ? 'mx-auto max-w-[700px]' : 'max-w-[700px]'
+        <p 
+          className={`text-gray-600 mt-3 text-base ${
+            isCenter ? 'mx-auto max-w-[700px]' : 'max-w-[900px]'
           }`}
         >
           {description}

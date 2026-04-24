@@ -181,8 +181,11 @@ export default function Header() {
       {/* 📱 Mobile Menu */}
       <MobileMenu
         isOpen={isMobileMenuOpen}
-        onClose={() => setIsMobileMenuOpen(false)}
-      />
+        onClose={() => setIsMobileMenuOpen(false)} timeLeft={{
+          days: 0,
+          hours: 0,
+          minutes: 0
+        }}      />
     </>
   );
 }

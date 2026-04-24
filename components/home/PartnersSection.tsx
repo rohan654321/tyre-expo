@@ -100,58 +100,74 @@ export default function PartnersSection() {
   };
 
   return (
-    <Section className="bg-mainColor2 overflow-hidden">
-      <SectionHeader
-        title="Partners & Sponsors"
-        align="center"
-      />
-      
-      <div className="relative w-full">
-        <div 
-          ref={scrollContainerRef}
-          className="overflow-x-auto scrollbar-hide cursor-grab"
-          style={{
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
-            WebkitOverflowScrolling: 'touch'
-          }}
-          onMouseDown={handleMouseDown}
-          onMouseLeave={handleMouseLeave}
-          onMouseUp={handleMouseUp}
-          onMouseMove={handleMouseMove}
-          onWheel={handleWheel}
-        >
-          <div className="flex gap-6 px-4 pb-4" style={{ minWidth: 'max-content' }}>
-            {[...partnersData, ...partnersData].map((partner, index) => (
-              <div 
-                key={index} 
-                className="flex flex-col items-center"
-                style={{ minWidth: '200px', maxWidth: '200px' }}
-              >
-                <div className="overflow-hidden rounded-lg bg-white px-6 py-4 shadow-lg w-full flex items-center justify-center min-h-[120px]">
-                  <Image
-                    src={partner.logo}
-                    alt={partner.name}
-                    width={120}
-                    height={80}
-                    className="object-contain"
-                    unoptimized
-                  />
+    <section className="bg-mainColor2 py-24">
+      <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
+        {/* Header - Same as SectorsSection */}
+        <div className="max-w-[900px] mb-12">
+          <p className="text-[#F08400] font-sans text-[14px] uppercase tracking-[1.5px]">
+            Our Ecosystem
+          </p>
+          <h2 className="font-bebas font-bold text-[48px] leading-[1.05] tracking-[2px] uppercase text-black">
+            Partners & Sponsors
+          </h2>
+          <p className="text-gray-600 mt-3 text-base">
+            Meet our valued partners and sponsors who make ITS Tyre Expo possible
+          </p>
+        </div>
+        
+        {/* Scrolling Container */}
+        <div className="relative w-full mt-8">
+          <div 
+            ref={scrollContainerRef}
+            className="overflow-x-auto scrollbar-hide cursor-grab"
+            style={{
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+              WebkitOverflowScrolling: 'touch'
+            }}
+            onMouseDown={handleMouseDown}
+            onMouseLeave={handleMouseLeave}
+            onMouseUp={handleMouseUp}
+            onMouseMove={handleMouseMove}
+            onWheel={handleWheel}
+          >
+            <div className="flex gap-6 pb-4" style={{ minWidth: 'max-content' }}>
+              {[...partnersData, ...partnersData].map((partner, index) => (
+                <div 
+                  key={index} 
+                  className="flex flex-col items-center flex-shrink-0"
+                  style={{ minWidth: '180px', maxWidth: '180px' }}
+                >
+                  <div className="overflow-hidden rounded-lg bg-white px-4 py-4 shadow-lg w-full flex items-center justify-center min-h-[100px]">
+                    <Image
+                      src={partner.logo}
+                      alt={partner.name}
+                      width={100}
+                      height={70}
+                      className="object-contain"
+                      unoptimized
+                    />
+                  </div>
+                  <small className="mt-3 text-sm text-center text-gray-600 line-clamp-1">{partner.name}</small>
+                  <span className="text-xs text-mainColor1 mt-1">{partner.type}</span>
                 </div>
-                <small className="mt-3 text-sm text-center text-gray-600">{partner.name}</small>
-                <span className="text-xs text-mainColor1 mt-1">{partner.type}</span>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Add custom styles for scrollbar hiding */}
       <style jsx>{`
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
         }
+        .line-clamp-1 {
+          display: -webkit-box;
+          -webkit-line-clamp: 1;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
       `}</style>
-    </Section>
+    </section>
   );
 }

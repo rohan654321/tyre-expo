@@ -2,8 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
+
 import BackToTop from '@/components/layout/BackToTop';
 import LoadingSpinner from '@/components/ui/loadingSpinner';
 import HeroSection from '@/components/home/HeroSection';
