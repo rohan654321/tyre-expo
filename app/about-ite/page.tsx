@@ -264,18 +264,17 @@ export default function AboutITEPage() {
 
   return (
     <div className="intro-animation">
-      {/* Main Content - Fixed header spacing */}
       <div className="page-spacing-wrapper">
-        <div className="pt-[120px] lg:pt-[140px]">
+        <div className="pt-[100px] sm:pt-[120px] lg:pt-[140px]">
           
           {/* About Us Section */}
           <div className="animated-block">
             <div className="animated-block-target">
-              <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
+              <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
                 <div className="lg:col-span-3">
-                  <div className="flex flex-col gap-5">
-                    <h2 className="font-bebas text-5xl text-black md:text-6xl">About Us</h2>
-                    <p className="text-lg font-[400px] text-gray-700">
+                  <div className="flex flex-col gap-4 sm:gap-5">
+                    <h2 className="font-bebas text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-black">About Us</h2>
+                    <p className="text-sm sm:text-base md:text-lg text-gray-700">
                       ITE Group is a business events organiser that has been operating in the Asian market since 1991. Every year, we host more than 30 of the largest industry events, including exhibitions, summits, and conferences. Powered by the Connect digital platform, the ITE ecosystem offers unique hybrid solutions for industry communities across Asia, the ASEAN countries, and beyond.
                       <br /><br />
                       With over 100 agents and hundreds of associations and partners spanning 150 countries and 5 continents, our global network seamlessly connects clients to opportunities around the world.
@@ -285,21 +284,18 @@ export default function AboutITEPage() {
                       ITE offices are located in Bangkok, Dubai, Beijing, and New Delhi.
                     </p>
                   </div>
-                  <div className="mt-16 flex flex-wrap justify-start gap-y-12 border-t border-gray-200 pt-10">
-                    {stats.slice(0, 6).map((stat, idx) => (
-                      <div key={idx} className="flex w-1/2 items-start justify-start md:w-1/4">
-                        <div className="flex items-start">
-                          <div className="px-8 text-start">
-                            <h3 className="font-bebas text-6xl md:text-7xl text-[#F08400]">
-                              {stat.value}
-                            </h3>
-                            <p className="mt-2 text-sm font-semibold uppercase text-black">
-                              {stat.label}
-                            </p>
-                          </div>
-                          {(idx < 3 || idx === 4) && (
-                            <div className="hidden h-16 w-px bg-gray-300 md:block"></div>
-                          )}
+                  
+                  {/* Stats Section - Responsive */}
+                  <div className="mt-10 sm:mt-12 lg:mt-16 flex flex-wrap justify-start gap-y-8 sm:gap-y-12 border-t border-gray-200 pt-8 sm:pt-10">
+                    {stats.map((stat, idx) => (
+                      <div key={idx} className="flex w-1/2 sm:w-1/3 md:w-1/4 items-start justify-start">
+                        <div className="px-4 sm:px-6 md:px-8 text-start">
+                          <h3 className="font-bebas text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-[#F08400]">
+                            {stat.value}
+                          </h3>
+                          <p className="mt-1 sm:mt-2 text-xs sm:text-sm font-semibold uppercase text-black">
+                            {stat.label}
+                          </p>
                         </div>
                       </div>
                     ))}
@@ -309,37 +305,36 @@ export default function AboutITEPage() {
             </div>
           </div>
 
-          {/* Mission, Vision, Values Section - FIXED IMAGES */}
-          <div className="animated-block mt-20">
+          {/* Mission, Vision, Values Section */}
+          <div className="animated-block mt-12 sm:mt-16 lg:mt-20">
             <div className="animated-block-target">
-              <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
-                <div className="mb-5 flex justify-between lg:items-end">
+              <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
+                <div className="mb-6 sm:mb-8 flex flex-col lg:flex-row justify-between lg:items-end gap-4">
                   <div className="lg:basis-2/3">
-                    <h3 className="font-bebas text-5xl text-black md:text-6xl">Working for Your Success</h3>
-                    <p className="mt-3 text-lg text-gray-700">
+                    <h3 className="font-bebas text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-black">Working for Your Success</h3>
+                    <p className="mt-3 text-sm sm:text-base md:text-lg text-gray-700">
                       At ITE Group, our goal is to empower businesses by creating impactful events that drive industry growth and foster valuable connections. We are dedicated to supporting our clients' success and facilitating meaningful opportunities for professionals worldwide.
                     </p>
                   </div>
                 </div>
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-5 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
                   {missionVisionValues.map((item, idx) => (
                     <div key={idx} className="group flex flex-col overflow-hidden rounded-lg bg-orange-50 transition-shadow duration-300 ease-in-out hover:shadow-lg">
-                      {/* FIXED: Replaced div with actual Image component */}
-                      <div className="relative h-48 w-full overflow-hidden bg-gray-300">
+                      <div className="relative h-48 sm:h-56 w-full overflow-hidden bg-gray-300">
                         <Image
                           src={item.image}
                           alt={item.title}
                           fill
-                          className="object-cover"
+                          className="object-cover transition-transform duration-500 group-hover:scale-105"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
                             target.style.display = 'none';
                           }}
                         />
                       </div>
-                      <div className="flex flex-col gap-4 p-5">
-                        <h4 className="text-2xl font-bold text-black">{item.title}</h4>
-                        <p className="text-gray-600">{item.content}</p>
+                      <div className="flex flex-col gap-3 sm:gap-4 p-4 sm:p-5">
+                        <h4 className="text-xl sm:text-2xl font-bold text-black">{item.title}</h4>
+                        <p className="text-sm sm:text-base text-gray-600">{item.content}</p>
                       </div>
                     </div>
                   ))}
@@ -348,14 +343,14 @@ export default function AboutITEPage() {
             </div>
           </div>
 
-          {/* Exhibitions at a Glance Section - FIXED IMAGES */}
-          <div className="animated-block mt-20">
+          {/* Exhibitions at a Glance Section */}
+          <div className="animated-block mt-12 sm:mt-16 lg:mt-20">
             <div className="animated-block-target">
-              <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
-                <div className="flex w-full items-end justify-between gap-10 max-lg:flex-wrap lg:gap-20 2xl:gap-40">
+              <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
+                <div className="flex w-full items-end justify-between gap-6 sm:gap-10 max-lg:flex-wrap lg:gap-20 2xl:gap-40">
                   <div>
-                    <h3 className="font-bebas text-5xl text-black md:text-6xl">Our Exhibitions at a Glance</h3>
-                    <p className="mt-3 text-gray-700">
+                    <h3 className="font-bebas text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-black">Our Exhibitions at a Glance</h3>
+                    <p className="mt-3 text-sm sm:text-base text-gray-700">
                       Each year, we organise and host over 30 leading industry events across key sectors, including exhibitions, summits, and conferences.
                       <br /><br />
                       Supported by the Connect digital platform, the ITE ecosystem offers innovative hybrid solutions for industry communities across Asia and beyond.
@@ -363,31 +358,30 @@ export default function AboutITEPage() {
                   </div>
                 </div>
 
-                <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:gap-10">
+                <div className="mt-8 sm:mt-10 grid gap-5 sm:gap-6 md:grid-cols-2 lg:grid-cols-3 xl:gap-8">
                   {exhibitions.map((exhibition, idx) => (
-                    <div key={idx} className="group flex flex-col gap-5 rounded-sm border border-black/10 bg-white p-5 shadow-sm transition-all hover:shadow-md xl:p-7">
-                      {/* FIXED: Replaced div with actual Image component */}
-                      <div className="relative h-32 w-full overflow-hidden  rounded-sm">
+                    <div key={idx} className="group flex flex-col gap-3 sm:gap-4 rounded-sm border border-black/10 bg-white p-4 sm:p-5 shadow-sm transition-all hover:shadow-md xl:p-6">
+                      <div className="relative h-28 sm:h-32 w-full overflow-hidden rounded-sm">
                         <Image
                           src={exhibition.image}
                           alt={exhibition.title}
                           fill
-                          className="object-cover"
+                          className="object-cover transition-transform duration-500 group-hover:scale-105"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
                             target.style.display = 'none';
-                            // Optionally add a fallback background color or default image
                           }}
                         />
                       </div>
-                      <p className="text-gray-600">{exhibition.description}</p>
-                      <p>Start Date: <span className="font-bold">{exhibition.startDate}</span></p>
-                      <p>End Date: <span className="font-bold">{exhibition.endDate}</span></p>
-                      <p>Venue: <span className="font-bold">{exhibition.venue}</span></p>
+                      <h4 className="text-lg sm:text-xl font-bold text-black">{exhibition.title}</h4>
+                      <p className="text-sm sm:text-base text-gray-600 line-clamp-2">{exhibition.description}</p>
+                      <p className="text-xs sm:text-sm">Start Date: <span className="font-bold">{exhibition.startDate}</span></p>
+                      <p className="text-xs sm:text-sm">End Date: <span className="font-bold">{exhibition.endDate}</span></p>
+                      <p className="text-xs sm:text-sm">Venue: <span className="font-bold line-clamp-2">{exhibition.venue}</span></p>
                       <Link href={exhibition.siteLink} target="_blank" className="mt-auto block">
-                        <button className="flex-center group gap-2 font-bebas text-2xl text-[#F08400] transition-all hover:text-black">
+                        <button className="flex-center group gap-2 font-bebas text-xl sm:text-2xl text-[#F08400] transition-all hover:text-black">
                           Visit Website
-                          <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 512 512" height="20" width="20" xmlns="http://www.w3.org/2000/svg">
+                          <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 512 512" height="18" width="18" xmlns="http://www.w3.org/2000/svg">
                             <path d="M294.1 256L167 129c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.3 34 0L345 239c9.1 9.1 9.3 23.7.7 33.1L201.1 417c-4.7 4.7-10.9 7-17 7s-12.3-2.3-17-7c-9.4-9.4-9.4-24.6 0-33.9l127-127.1z"></path>
                           </svg>
                         </button>
@@ -400,7 +394,9 @@ export default function AboutITEPage() {
           </div>
 
           {/* Partners Section */}
-          <PartnersSection />
+          <div className="mt-12 sm:mt-16 lg:mt-20">
+            <PartnersSection />
+          </div>
         </div>
         <BackToTop/>
       </div>
@@ -416,6 +412,12 @@ export default function AboutITEPage() {
         }
         .font-bebas {
           font-family: 'Bebas Neue', cursive;
+        }
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
         }
       `}</style>
     </div>
