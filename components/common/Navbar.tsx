@@ -105,9 +105,9 @@ export default function Navbar() {
 
   return (
     <>
-      <div className={`bg-[#1e1e1e]/80 py-2 sm:py-3 text-white ${isScrolled ? 'sticky top-0 z-50' : ''}`}>
-        <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
-          <div className="flex items-center justify-between lg:justify-start flex-wrap gap-4">
+      <div className="bg-[#1e1e1e]/80 py-3 text-white">
+        <div className="w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-16">
+          <div className="flex items-center justify-between flex-wrap gap-4">
             {/* Logo on left */}
             <div className="flex-shrink-0">
               <Link href="/">
@@ -116,7 +116,7 @@ export default function Navbar() {
                   alt="India Tyre Show" 
                   width={40} 
                   height={40} 
-                  className="h-7 sm:h-8 lg:h-10 w-auto cursor-pointer"
+                  className="h-8 sm:h-10 w-auto cursor-pointer"
                   onError={(e) => {
                     (e.target as HTMLImageElement).style.display = 'none';
                   }}
@@ -124,58 +124,26 @@ export default function Navbar() {
               </Link>
             </div>
             
-            {/* Timer - Mobile */}
-            <div className="flex lg:hidden gap-1">
-              {[
-                { label: 'Days', value: timeLeft.days },
-                { label: 'Hours', value: timeLeft.hours },
-                { label: 'Mins', value: timeLeft.minutes },
-              ].map((item, i) => (
-                <div
-                  key={i}
-                  className="relative overflow-hidden flex flex-col items-center justify-center 
-                    bg-gray-700/70 backdrop-blur-md px-1.5 py-1 min-w-[45px]
-                    border border-white/10 shadow-md rounded"
-                >
-                  <span className="text-sm font-bold relative z-10">
-                    {String(item.value).padStart(2, '0')}
-                  </span>
-                  <span className="text-[9px] uppercase tracking-wide relative z-10">
-                    {item.label}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            {/* Exhibitor Login - Mobile */}
-            <Link
-              href="/login/"
-              className="lg:hidden bg-[#2A2A2A] text-white px-3 py-1.5 text-xs rounded border border-white/20 
-              hover:bg-[#F08400] hover:text-black transition-all duration-300 whitespace-nowrap"
-            >
-              Login
-            </Link>
-            
             {/* Desktop Navigation Links */}
-            <div className="hidden lg:flex items-center gap-3 xl:gap-4 2xl:gap-8 overflow-x-auto">
+            <div className="hidden lg:flex items-center gap-4 xl:gap-8 flex-wrap">
               {navItems.map((item) => (
                 <div 
                   key={item.title} 
-                  className="relative flex-shrink-0"
+                  className="relative"
                   onMouseEnter={() => item.links && item.links.length > 0 && handleMouseEnter(item.title)}
                   onMouseLeave={handleMouseLeave}
                 >
                   {item.links && item.links.length > 0 ? (
                     <>
                       <button
-                        className="flex items-center gap-1 text-xs xl:text-sm 2xl:text-base hover:text-orange-500 transition-colors whitespace-nowrap py-2"
+                        className="flex items-center gap-1 text-sm xl:text-base hover:text-orange-500 transition-colors whitespace-nowrap py-2"
                       >
                         {item.title}
                         <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${openDropdown === item.title ? 'rotate-180' : ''}`} />
                       </button>
                       {openDropdown === item.title && (
                         <div 
-                          className="absolute left-0 top-full z-50 w-48 xl:w-56 rounded-md bg-[#1e1e1e] shadow-lg border border-gray-700"
+                          className="absolute left-0 top-full z-50 w-56 rounded-md bg-[#1e1e1e] shadow-lg border border-gray-700"
                           onMouseEnter={() => handleMouseEnter(item.title)}
                           onMouseLeave={handleMouseLeave}
                         >
@@ -184,7 +152,7 @@ export default function Navbar() {
                               <Link
                                 key={link.text}
                                 href={link.href}
-                                className="block px-3 xl:px-4 py-1.5 xl:py-2 text-xs xl:text-sm hover:bg-orange-500 hover:text-white transition-colors"
+                                className="block px-4 py-2 text-sm hover:bg-orange-500 hover:text-white transition-colors"
                               >
                                 {link.text}
                               </Link>
@@ -196,7 +164,7 @@ export default function Navbar() {
                   ) : (
                     <Link 
                       href={item.href || '#'} 
-                      className="text-xs xl:text-sm 2xl:text-base hover:text-orange-500 transition-colors whitespace-nowrap block py-2"
+                      className="text-sm xl:text-base hover:text-orange-500 transition-colors whitespace-nowrap block py-2"
                     >
                       {item.title}
                     </Link>
@@ -205,40 +173,57 @@ export default function Navbar() {
               ))}
             </div>
 
-            {/* Desktop Timer and Login - Right side */}
-            <div className="hidden lg:flex items-center gap-3 xl:gap-4 ml-auto">
-              {/* Timer */}
-              <div className="flex gap-1 xl:gap-2">
-                {[
-                  { label: 'Days', value: timeLeft.days },
-                  { label: 'Hours', value: timeLeft.hours },
-                  { label: 'Mins', value: timeLeft.minutes },
-                ].map((item, i) => (
-                  <div
-                    key={i}
-                    className="relative overflow-hidden flex flex-col items-center justify-center 
-                      bg-gray-700/70 backdrop-blur-md px-1.5 xl:px-2 py-1 xl:py-1.5 min-w-[50px] xl:min-w-[55px]
-                      border border-white/10 shadow-md rounded"
-                  >
-                    <span className="text-sm xl:text-base font-bold relative z-10">
-                      {String(item.value).padStart(2, '0')}
-                    </span>
-                    <span className="text-[10px] xl:text-xs uppercase tracking-wide relative z-10">
-                      {item.label}
-                    </span>
-                  </div>
-                ))}
-              </div>
+            {/* Mobile Menu Button */}
+            <button className="lg:hidden text-white p-2">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
 
-              {/* Exhibitor Login Button */}
-              <Link
-                href="/login/"
-                className="bg-[#2A2A2A] text-white px-4 xl:px-6 py-1.5 xl:py-2 text-sm xl:text-base rounded border border-white/20 
-                hover:bg-[#F08400] hover:text-black transition-all duration-300 whitespace-nowrap"
-              >
-                Exhibitor Login
-              </Link>
+        {/* Timer and Login Button - Below navbar (Original Design) */}
+        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 mt-3">
+          <div
+            className={`transition-all duration-500 flex flex-wrap gap-4 justify-center lg:justify-end ${
+              isScrolled
+                ? 'opacity-0 -translate-y-5 pointer-events-none hidden lg:flex'
+                : 'opacity-100 translate-y-0'
+            }`}
+          >
+            {/* Timer */}
+            <div className="flex gap-0.5 sm:gap-1">
+              {[
+                { label: 'Days', value: timeLeft.days },
+                { label: 'Hours', value: timeLeft.hours },
+                { label: 'Mins', value: timeLeft.minutes },
+              ].map((item, i) => (
+                <div
+                  key={i}
+                  className="relative overflow-hidden flex flex-col items-center justify-center 
+                    bg-gray-700/70 backdrop-blur-md px-2 sm:px-3 py-1.5 sm:py-2 min-w-[55px] sm:min-w-[65px]
+                    border border-white/10 shadow-md rounded
+                    transition-all duration-300 
+                    hover:bg-[#F08400] hover:text-black hover:scale-105"
+                >
+                  <span className="text-base sm:text-lg font-bold relative z-10">
+                    {String(item.value).padStart(2, '0')}
+                  </span>
+                  <span className="text-[10px] sm:text-xs uppercase tracking-wide relative z-10">
+                    {item.label}
+                  </span>
+                </div>
+              ))}
             </div>
+
+            {/* Exhibitor Login Button */}
+            <Link
+              href="/login/"
+              className="inline-block bg-[#2A2A2A] text-white px-5 sm:px-6 lg:px-8 py-2 sm:py-3 text-sm sm:text-base shadow-xl border border-white/20 rounded
+              hover:bg-[#F08400] hover:text-black hover:scale-105 transition-all duration-300 whitespace-nowrap"
+            >
+              Exhibitor Login
+            </Link>
           </div>
         </div>
       </div>

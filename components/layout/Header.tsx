@@ -157,7 +157,16 @@ export default function Header() {
               />
             </Link>
 
-            {/* Mobile Timer */}
+            <button 
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="p-1 hover:bg-white/10 rounded-lg transition"
+            >
+              <Menu size={24} />
+            </button>
+          </div>
+
+          {/* Mobile Timer and Action Buttons */}
+          <div className="flex items-center justify-between gap-3 mt-3">
             <div className="flex gap-1">
               {[
                 { label: 'D', value: timeLeft.days },
@@ -166,7 +175,7 @@ export default function Header() {
               ].map((item, i) => (
                 <div
                   key={i}
-                  className="bg-gray-800/90 backdrop-blur-md px-1.5 py-1 rounded min-w-[35px] text-center"
+                  className="bg-gray-800/90 backdrop-blur-md px-2 py-1 rounded min-w-[40px] text-center"
                 >
                   <span className="text-xs font-bold text-white block">
                     {String(item.value).padStart(2, '0')}
@@ -176,15 +185,15 @@ export default function Header() {
               ))}
             </div>
 
-            <button 
-              onClick={() => setIsMobileMenuOpen(true)}
-              className="p-1 hover:bg-white/10 rounded-lg transition"
+            <Link
+              href="/login/"
+              className="bg-[#2A2A2A] text-white px-3 py-1.5 text-xs rounded border border-white/20 
+              hover:bg-[#F08400] hover:text-black transition-all duration-300"
             >
-              <Menu size={24} />
-            </button>
+              Login
+            </Link>
           </div>
 
-          {/* Mobile Action Buttons */}
           <div className="flex gap-3 mt-3">
             <Link
               href="/exhibiting-enquiry/"
@@ -202,7 +211,7 @@ export default function Header() {
         </div>
 
         {/* Spacer for fixed mobile header */}
-        <div className="lg:hidden h-[95px] sm:h-[100px]"></div>
+        <div className="lg:hidden h-[130px]"></div>
       </header>
 
       {/* Mobile Menu */}
