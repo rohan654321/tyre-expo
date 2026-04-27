@@ -73,20 +73,20 @@ export default function RequirementsPage() {
   ]);
 
   const requirementCategories = [
-    { id: 'basic-info', name: 'Basic Information', icon: UserIcon, color: 'from-blue-500 to-indigo-500', bgColor: 'bg-blue-50', textColor: 'text-blue-600', description: 'Company & contact details (Required)', href: '/dashboard/requirements/basic-info' },
-    { id: 'booth-details', name: 'Booth Details', icon: MapPinIcon, color: 'from-amber-500 to-orange-500', bgColor: 'bg-amber-50', textColor: 'text-amber-600', description: 'Booth & contractor info (Required)', href: '/dashboard/requirements/booth-details' },
-    { id: 'electrical', name: 'Electrical Load', icon: BoltIcon, color: 'from-blue-500 to-cyan-500', bgColor: 'bg-blue-50', textColor: 'text-blue-600', description: 'Power connections for machinery', href: '/dashboard/requirements/electrical' },
-    { id: 'machinery', name: 'Machinery Setup', icon: WrenchScrewdriverIcon, color: 'from-slate-500 to-gray-500', bgColor: 'bg-slate-50', textColor: 'text-slate-600', description: 'Heavy equipment installation', href: '/dashboard/requirements/machinery' },
-    { id: 'personnel', name: 'Personnel Passes', icon: UserGroupIcon, color: 'from-green-500 to-emerald-500', bgColor: 'bg-green-50', textColor: 'text-green-600', description: 'Staff & exhibitor passes', href: '/dashboard/requirements/personnel' },
-    { id: 'furniture', name: 'Furniture Rental', icon: ComputerDesktopIcon, color: 'from-purple-500 to-violet-500', bgColor: 'bg-purple-50', textColor: 'text-purple-600', description: 'Tables, chairs, displays', href: '/dashboard/requirements/furniture' },
-    { id: 'hostess', name: 'Hostess Services', icon: SparklesIcon, color: 'from-pink-500 to-rose-500', bgColor: 'bg-pink-50', textColor: 'text-pink-600', description: 'Event hostesses', href: '/dashboard/requirements/hostess' },
-    { id: 'compressed-air', name: 'Compressed Air', icon: WifiIcon, color: 'from-cyan-500 to-teal-500', bgColor: 'bg-cyan-50', textColor: 'text-cyan-600', description: 'Air connections for tools', href: '/dashboard/requirements/compressed-air' },
-    { id: 'water', name: 'Water Connection', icon: TruckIcon, color: 'from-teal-500 to-emerald-500', bgColor: 'bg-teal-50', textColor: 'text-teal-600', description: 'Water supply for booth', href: '/dashboard/requirements/water' },
-    { id: 'security', name: 'Security Guards', icon: ShieldCheckIcon, color: 'from-amber-500 to-orange-500', bgColor: 'bg-amber-50', textColor: 'text-amber-600', description: 'Security personnel', href: '/dashboard/requirements/security' },
-    { id: 'housekeeping', name: 'Housekeeping', icon: HomeModernIcon, color: 'from-indigo-500 to-blue-500', bgColor: 'bg-indigo-50', textColor: 'text-indigo-600', description: 'Cleaning staff', href: '/dashboard/requirements/housekeeping' },
-    { id: 'security-deposit', name: 'Security Deposit', icon: BanknotesIcon, color: 'from-emerald-500 to-teal-500', bgColor: 'bg-emerald-50', textColor: 'text-emerald-600', description: 'Contractor security deposit', href: '/dashboard/requirements/security-deposit' },
-    { id: 'machine-display', name: 'Machine Display', icon: CubeIcon, color: 'from-slate-500 to-gray-500', bgColor: 'bg-slate-50', textColor: 'text-slate-600', description: 'Heavy machinery details', href: '/dashboard/requirements/machine-display' },
-    { id: 'rental-items', name: 'AV & IT Rental', icon: ComputerDesktopIcon, color: 'from-purple-500 to-pink-500', bgColor: 'bg-purple-50', textColor: 'text-purple-600', description: 'Audio/Video equipment', href: '/dashboard/requirements/rental-items' },
+    { id: 'basic-info', name: 'Basic Information', icon: UserIcon, color: 'from-blue-500 to-indigo-500', bgColor: 'bg-blue-50', textColor: 'text-blue-600', description: 'Company & contact details (Required)', isCompleted: true },
+    { id: 'booth-details', name: 'Booth Details', icon: MapPinIcon, color: 'from-amber-500 to-orange-500', bgColor: 'bg-amber-50', textColor: 'text-amber-600', description: 'Booth & contractor info (Required)', isCompleted: true },
+    { id: 'electrical', name: 'Electrical Load', icon: BoltIcon, color: 'from-blue-500 to-cyan-500', bgColor: 'bg-blue-50', textColor: 'text-blue-600', description: 'Power connections for machinery', isCompleted: false },
+    { id: 'machinery', name: 'Machinery Setup', icon: WrenchScrewdriverIcon, color: 'from-slate-500 to-gray-500', bgColor: 'bg-slate-50', textColor: 'text-slate-600', description: 'Heavy equipment installation', isCompleted: false },
+    { id: 'personnel', name: 'Personnel Passes', icon: UserGroupIcon, color: 'from-green-500 to-emerald-500', bgColor: 'bg-green-50', textColor: 'text-green-600', description: 'Staff & exhibitor passes', isCompleted: false },
+    { id: 'furniture', name: 'Furniture Rental', icon: ComputerDesktopIcon, color: 'from-purple-500 to-violet-500', bgColor: 'bg-purple-50', textColor: 'text-purple-600', description: 'Tables, chairs, displays', isCompleted: false },
+    { id: 'hostess', name: 'Hostess Services', icon: SparklesIcon, color: 'from-pink-500 to-rose-500', bgColor: 'bg-pink-50', textColor: 'text-pink-600', description: 'Event hostesses', isCompleted: false },
+    { id: 'compressed-air', name: 'Compressed Air', icon: WifiIcon, color: 'from-cyan-500 to-teal-500', bgColor: 'bg-cyan-50', textColor: 'text-cyan-600', description: 'Air connections for tools', isCompleted: false },
+    { id: 'water', name: 'Water Connection', icon: TruckIcon, color: 'from-teal-500 to-emerald-500', bgColor: 'bg-teal-50', textColor: 'text-teal-600', description: 'Water supply for booth', isCompleted: false },
+    { id: 'security', name: 'Security Guards', icon: ShieldCheckIcon, color: 'from-amber-500 to-orange-500', bgColor: 'bg-amber-50', textColor: 'text-amber-600', description: 'Security personnel', isCompleted: false },
+    { id: 'housekeeping', name: 'Housekeeping', icon: HomeModernIcon, color: 'from-indigo-500 to-blue-500', bgColor: 'bg-indigo-50', textColor: 'text-indigo-600', description: 'Cleaning staff', isCompleted: false },
+    { id: 'security-deposit', name: 'Security Deposit', icon: BanknotesIcon, color: 'from-emerald-500 to-teal-500', bgColor: 'bg-emerald-50', textColor: 'text-emerald-600', description: 'Contractor security deposit', isCompleted: false },
+    { id: 'machine-display', name: 'Machine Display', icon: CubeIcon, color: 'from-slate-500 to-gray-500', bgColor: 'bg-slate-50', textColor: 'text-slate-600', description: 'Heavy machinery details', isCompleted: false },
+    { id: 'rental-items', name: 'AV & IT Rental', icon: ComputerDesktopIcon, color: 'from-purple-500 to-pink-500', bgColor: 'bg-purple-50', textColor: 'text-purple-600', description: 'Audio/Video equipment', isCompleted: false },
   ];
 
   const getStatusIcon = (status: string) => {
@@ -185,30 +185,40 @@ export default function RequirementsPage() {
         </div>
       </div>
 
-      {/* Quick Categories Grid - Responsive Grid with consistent spacing */}
+      {/* Quick Categories Grid - NO CLICK NAVIGATION, only shows status */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6">
         <h2 className="text-base sm:text-lg font-semibold text-gray-800 mb-4">Quick Add Requirements</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
           {requirementCategories.map((category) => {
             const Icon = category.icon;
             return (
-              <button
+              <div
                 key={category.id}
-                onClick={() => router.push(category.href)}
-                className="group text-left p-3 sm:p-4 rounded-xl border border-gray-100 hover:shadow-md transition-all hover:-translate-y-0.5 bg-white"
+                className="group text-left p-3 sm:p-4 rounded-xl border border-gray-100 bg-white opacity-60 cursor-not-allowed"
               >
-                <div className={`h-10 w-10 sm:h-12 sm:w-12 rounded-xl ${category.bgColor} flex items-center justify-center mb-2 sm:mb-3 group-hover:scale-110 transition-transform`}>
-                  <Icon className={`h-5 w-5 sm:h-6 sm:w-6 ${category.textColor}`} />
+                <div className="relative">
+                  <div className={`h-10 w-10 sm:h-12 sm:w-12 rounded-xl ${category.bgColor} flex items-center justify-center mb-2 sm:mb-3`}>
+                    <Icon className={`h-5 w-5 sm:h-6 sm:w-6 ${category.textColor}`} />
+                  </div>
+                  {/* Show tick mark only if completed */}
+                  {category.isCompleted && (
+                    <div className="absolute -top-1 -right-1 bg-green-500 rounded-full p-0.5">
+                      <CheckCircleIcon className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
+                    </div>
+                  )}
                 </div>
                 <h3 className="font-semibold text-gray-800 text-xs sm:text-sm">{category.name}</h3>
                 <p className="text-[10px] sm:text-xs text-gray-400 mt-0.5 sm:mt-1 line-clamp-2">{category.description}</p>
-              </button>
+                {!category.isCompleted && (
+                  <span className="inline-block mt-2 text-[10px] sm:text-xs text-gray-400">⏳ Pending</span>
+                )}
+              </div>
             );
           })}
         </div>
       </div>
 
-      {/* Requirements List */}
+      {/* Requirements List - Click still works to view details */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100">
           <h2 className="text-base sm:text-lg font-semibold text-gray-800">Your Requirements</h2>
