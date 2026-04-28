@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import { Providers } from "./providers";
 
 const bebas = Bebas_Neue({
   subsets: ["latin"],
@@ -30,7 +31,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const hideHeaderFooter = pathname.startsWith("/dashboard") || pathname.startsWith("/register");
+  const hideHeaderFooter = pathname.startsWith("/dashboard") || pathname.startsWith("/register") || pathname.startsWith("/admin");
   return (
     <html
       lang="en"
@@ -44,7 +45,8 @@ export default function RootLayout({
         {/* ✅ IMPORTANT: spacing for fixed header */}
        
            {!hideHeaderFooter && <Header />}
-          {children}
+        <Providers>{children}</Providers>
+
       
 
         {/* ✅ Footer */}
