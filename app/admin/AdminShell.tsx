@@ -41,6 +41,11 @@ import {
     AlertTriangle,
     ClipboardCheck,
     TrendingUp,
+    Banknote,
+    Bolt,
+    Droplet,
+    Tv,
+    Wind,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import toast from "react-hot-toast";
@@ -58,27 +63,27 @@ const navigation = [
         color: "text-blue-500",
         href: "/admin/exhibitors",
     },
-    {
-        name: "Tyre Brands",
-        icon: Package,
-        color: "text-emerald-500",
-        subItems: [
-            { name: "All Brands", href: "/admin/tyre-brands", icon: Package },
-            { name: "Categories", href: "/admin/tyre-categories", icon: Layers },
-            { name: "Add New Brand", href: "/admin/tyre-brands/new", icon: Package },
-        ],
-    },
-    {
-        name: "Tyre Products",
-        icon: Truck,
-        color: "text-purple-500",
-        subItems: [
-            { name: "All Tyres", href: "/admin/tyres", icon: Truck },
-            { name: "Categories", href: "/admin/tyre-categories", icon: Layers },
-            { name: "Specifications", href: "/admin/tyre-specs", icon: Gauge },
-            { name: "Add New Tyre", href: "/admin/tyres/new", icon: Truck },
-        ],
-    },
+    // {
+    //     name: "Tyre Brands",
+    //     icon: Package,
+    //     color: "text-emerald-500",
+    //     subItems: [
+    //         { name: "All Brands", href: "/admin/tyre-brands", icon: Package },
+    //         { name: "Categories", href: "/admin/tyre-categories", icon: Layers },
+    //         { name: "Add New Brand", href: "/admin/tyre-brands/new", icon: Package },
+    //     ],
+    // },
+    // {
+    //     name: "Tyre Products",
+    //     icon: Truck,
+    //     color: "text-purple-500",
+    //     subItems: [
+    //         { name: "All Tyres", href: "/admin/tyres", icon: Truck },
+    //         { name: "Categories", href: "/admin/tyre-categories", icon: Layers },
+    //         { name: "Specifications", href: "/admin/tyre-specs", icon: Gauge },
+    //         { name: "Add New Tyre", href: "/admin/tyres/new", icon: Truck },
+    //     ],
+    // },
     {
         name: "Floor Plan",
         icon: Globe,
@@ -112,6 +117,15 @@ const navigation = [
                 icon: Settings,
                 color: "text-gray-500",
                 subItems: [
+                    { name: "Furniture Catalog", href: "/admin/furniture", icon: Package },
+                    { name: "AV & IT Rentals", href: "/admin/rental-items", icon: Tv },
+                    { name: "Electrical Rates", href: "/admin/electrical-rates", icon: Bolt },
+                    { name: "Hostess Rates", href: "/admin/hostess-rates", icon: Sparkles },
+                    { name: "Compressed Air", href: "/admin/compressed-air", icon: Wind },
+                    { name: "Water Connection", href: "/admin/water-connection", icon: Droplet },
+                    { name: "Security Guard", href: "/admin/security-guard", icon: Shield },
+                    { name: "Housekeeping", href: "/admin/housekeeping", icon: Home },
+                    { name: "Security Deposit", href: "/admin/security-deposit", icon: Banknote },
                     { name: "Booth Categories", href: "/admin/booth-categories", icon: LayoutDashboard },
                     { name: "Booth Add-ons", href: "/admin/booth-addons", icon: Package },
                 ]
