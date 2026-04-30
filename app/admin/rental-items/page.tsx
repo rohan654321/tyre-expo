@@ -1,56 +1,122 @@
-// app/admin/rental-items/page.tsx - Admin manages AV/IT rental catalog
+// app/admin/rental-items/page.tsx - FIXED IMPORT
 "use client";
 
-import { useState } from "react";
-import { Plus, Edit, Trash2, Search, Package, CheckCircle, XCircle, Tv, Wifi, Mic, Headphones, Printer } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Plus, Edit, Trash2, Search, Package, Tv, Printer, CheckCircle, XCircle, RefreshCw } from "lucide-react";
 import Link from "next/link";
+import { getRentalItems, deleteRentalItem, updateRentalItemStatus, getRentalItemStatistics, RentalItem } from "@/lib/api/rentalItems";
+import toast from "react-hot-toast";
 
-interface RentalItem {
-    id: string;
-    code: string;
-    name: string;
-    description: string;
-    pricePerDay: number;
-    category: string;
-    isActive: boolean;
-}
-
-const sampleRentalItems: RentalItem[] = [
-    { id: "1", code: "AV-001", name: "4K Projector", description: "High brightness 5000 lumens projector", pricePerDay: 5000, category: "AV Equipment", isActive: true },
-    { id: "2", code: "AV-002", name: "Projection Screen", description: '120" motorized screen with remote', pricePerDay: 2000, category: "AV Equipment", isActive: true },
-    { id: "3", code: "AU-001", name: "PA Sound System", description: "Complete sound system with 4 speakers + mixer", pricePerDay: 8000, category: "Audio", isActive: true },
-    { id: "4", code: "AU-002", name: "Wireless Microphone", description: "Professional wireless mic set (2 mics)", pricePerDay: 1500, category: "Audio", isActive: true },
-    { id: "5", code: "DS-001", name: '65" LED TV', description: "4K Smart TV with rolling stand", pricePerDay: 4000, category: "Display", isActive: true },
-    { id: "6", code: "IT-001", name: "High Performance Laptop", description: "Intel i7, 16GB RAM, 512GB SSD", pricePerDay: 3000, category: "IT Equipment", isActive: true },
-    { id: "7", code: "IT-002", name: "iPad for Demo", description: "iPad Pro 12.9 for product demos", pricePerDay: 2000, category: "IT Equipment", isActive: false },
+const categories = [
+    { value: "All", label: "All Categories" },
+    { value: "AV", label: "AV Equipment", icon: Tv },
+    { value: "IT", label: "IT Equipment", icon: Printer },
+    { value: "Other", label: "Other", icon: Package }
 ];
-
-const categories = ["All", "AV Equipment", "Audio", "Display", "IT Equipment", "Lighting", "Other"];
 
 const getCategoryIcon = (category: string) => {
     switch (category) {
-        case "AV Equipment": return <Tv size={16} />;
-        case "Audio": return <Mic size={16} />;
-        case "Display": return <Tv size={16} />;
-        case "IT Equipment": return <Printer size={16} />;
+        case "AV": return <Tv size={16} />;
+        case "IT": return <Printer size={16} />;
         default: return <Package size={16} />;
     }
 };
 
+const getCategoryLabel = (category: string) => {
+    switch (category) {
+        case "AV": return "AV Equipment";
+        case "IT": return "IT Equipment";
+        default: return "Other";
+    }
+};
+
 export default function AdminRentalItemsPage() {
+    const [items, setItems] = useState<RentalItem[]>([]);
+    const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
     const [categoryFilter, setCategoryFilter] = useState("All");
     const [statusFilter, setStatusFilter] = useState("all");
+    const [statistics, setStatistics] = useState({ total: 0, active: 0, categories: 0 });
 
-    const filteredItems = sampleRentalItems.filter(item => {
-        const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase()) || item.code.toLowerCase().includes(search.toLowerCase());
-        const matchesCategory = categoryFilter === "All" || item.category === categoryFilter;
-        const matchesStatus = statusFilter === "all" || (statusFilter === "active" ? item.isActive : !item.isActive);
-        return matchesSearch && matchesCategory && matchesStatus;
-    });
+    const fetchItems = async () => {
+        try {
+            setLoading(true);
+            const response = await getRentalItems({
+                category: categoryFilter !== "All" ? categoryFilter : undefined,
+                isActive: statusFilter !== "all" ? (statusFilter === "active" ? true : false) : undefined,
+                search: search || undefined
+            });
+
+            if (response.success) {
+                setItems(response.data || []);
+            }
+        } catch (error) {
+            console.error("Failed to fetch rental items:", error);
+            toast.error("Failed to load rental items");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchStatistics = async () => {
+        try {
+            const response = await getRentalItemStatistics();
+            if (response.success) {
+                setStatistics({
+                    total: response.data.totalItems || 0,
+                    active: response.data.activeItems || 0,
+                    categories: response.data.categoriesCount || 0
+                });
+            }
+        } catch (error) {
+            console.error("Failed to fetch statistics:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchItems();
+        fetchStatistics();
+    }, [categoryFilter, statusFilter]);
+
+    const handleSearch = () => {
+        fetchItems();
+    };
+
+    const handleDelete = async (id: string, name: string) => {
+        if (confirm(`Are you sure you want to delete "${name}"?`)) {
+            try {
+                const response = await deleteRentalItem(id);
+                if (response.success) {
+                    toast.success("Rental item deleted successfully");
+                    fetchItems();
+                    fetchStatistics();
+                } else {
+                    toast.error(response.message || "Failed to delete");
+                }
+            } catch (error) {
+                toast.error("Failed to delete rental item");
+            }
+        }
+    };
+
+    const handleToggleStatus = async (id: string, currentStatus: boolean) => {
+        try {
+            const response = await updateRentalItemStatus(id, !currentStatus);
+            if (response.success) {
+                toast.success(`Item ${!currentStatus ? 'activated' : 'deactivated'} successfully`);
+                fetchItems();
+                fetchStatistics();
+            } else {
+                toast.error(response.message || "Failed to update status");
+            }
+        } catch (error) {
+            toast.error("Failed to update status");
+        }
+    };
 
     return (
         <div className="space-y-6 p-6">
+            {/* Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h1 className="text-2xl font-bold text-white">AV & IT Rental Catalog</h1>
@@ -62,72 +128,150 @@ export default function AdminRentalItemsPage() {
                 </Link>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {/* Stats */}
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                 <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
-                    <p className="text-2xl font-bold text-white">{sampleRentalItems.length}</p>
+                    <p className="text-2xl font-bold text-white">{statistics.total}</p>
                     <p className="text-xs text-gray-400">Total Items</p>
                 </div>
                 <div className="bg-green-500/10 rounded-xl p-4 border border-green-500/30">
-                    <p className="text-2xl font-bold text-green-400">{sampleRentalItems.filter(i => i.isActive).length}</p>
+                    <p className="text-2xl font-bold text-green-400">{statistics.active}</p>
                     <p className="text-xs text-gray-400">Active</p>
                 </div>
+                <div className="bg-red-500/10 rounded-xl p-4 border border-red-500/30">
+                    <p className="text-2xl font-bold text-red-400">{statistics.total - statistics.active}</p>
+                    <p className="text-xs text-gray-400">Inactive</p>
+                </div>
                 <div className="bg-purple-500/10 rounded-xl p-4 border border-purple-500/30">
-                    <p className="text-2xl font-bold text-purple-400">5</p>
+                    <p className="text-2xl font-bold text-purple-400">{statistics.categories}</p>
                     <p className="text-xs text-gray-400">Categories</p>
                 </div>
             </div>
 
+            {/* Filters */}
             <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
                 <div className="flex flex-col sm:flex-row gap-4">
                     <div className="flex-1 relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                        <input type="text" placeholder="Search by name or code..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-10 pr-4 py-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white" />
+                        <input
+                            type="text"
+                            placeholder="Search by name or code..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+                            className="w-full pl-10 pr-4 py-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-orange-500"
+                        />
                     </div>
-                    <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)} className="px-4 py-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white">
-                        {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                    <select
+                        value={categoryFilter}
+                        onChange={(e) => setCategoryFilter(e.target.value)}
+                        className="px-4 py-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-orange-500"
+                    >
+                        {categories.map(cat => (
+                            <option key={cat.value} value={cat.value}>{cat.label}</option>
+                        ))}
                     </select>
-                    <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="px-4 py-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white">
+                    <select
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        className="px-4 py-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-orange-500"
+                    >
                         <option value="all">All Status</option>
                         <option value="active">Active</option>
                         <option value="inactive">Inactive</option>
                     </select>
+                    <button
+                        onClick={fetchItems}
+                        className="px-4 py-2.5 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition flex items-center gap-2"
+                    >
+                        <RefreshCw size={18} />
+                        Refresh
+                    </button>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredItems.map((item) => (
-                    <div key={item.id} className="bg-gray-800/50 rounded-xl border border-gray-700 overflow-hidden hover:border-orange-500/30 transition-all">
-                        <div className="p-5">
-                            <div className="flex justify-between items-start mb-3">
-                                <div>
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <span className="flex items-center gap-1 text-xs px-2 py-0.5 bg-gray-700 rounded-full text-gray-300">
-                                            {getCategoryIcon(item.category)} {item.category}
-                                        </span>
-                                        <span className={`text-xs px-2 py-0.5 rounded-full ${item.isActive ? "bg-green-500/20 text-green-400" : "bg-gray-500/20 text-gray-400"}`}>
-                                            {item.isActive ? "Active" : "Inactive"}
-                                        </span>
+            {/* Items Grid */}
+            {loading ? (
+                <div className="flex items-center justify-center min-h-[400px]">
+                    <div className="animate-spin rounded-full h-12 w-12 border-4 border-orange-500 border-t-transparent"></div>
+                </div>
+            ) : items.length === 0 ? (
+                <div className="bg-gray-800/50 rounded-xl border border-gray-700 p-12 text-center">
+                    <Package className="h-16 w-16 text-gray-500 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-white mb-2">No Rental Items Found</h3>
+                    <p className="text-gray-400 mb-6">Add your first rental item to get started</p>
+                    <Link href="/admin/rental-items/new" className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-lg hover:from-orange-600 hover:to-red-700 transition">
+                        <Plus size={18} />
+                        Add Rental Item
+                    </Link>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {items.map((item) => (
+                        <div key={item.id} className="bg-gray-800/50 rounded-xl border border-gray-700 overflow-hidden hover:border-orange-500/30 transition-all">
+                            {/* Image Section */}
+                            <div className="h-48 bg-gray-700 relative">
+                                {item.imageUrl ? (
+                                    <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center">
+                                        {getCategoryIcon(item.category)}
                                     </div>
-                                    <h3 className="text-lg font-semibold text-white">{item.name}</h3>
-                                    <p className="text-xs text-gray-500 font-mono mt-1">{item.code}</p>
-                                </div>
-                                <div className="flex gap-1">
-                                    <button className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg"><Edit size={16} /></button>
-                                    <button className="p-1.5 text-gray-400 hover:text-red-400 hover:bg-red-500/20 rounded-lg"><Trash2 size={16} /></button>
-                                </div>
+                                )}
+                                <span className={`absolute top-3 right-3 px-2 py-1 text-xs rounded-full ${item.isActive ? "bg-green-500/90 text-white" : "bg-gray-500/90 text-white"}`}>
+                                    {item.isActive ? "Active" : "Inactive"}
+                                </span>
                             </div>
-                            <p className="text-sm text-gray-400 mb-3">{item.description}</p>
-                            <div className="flex justify-between items-center pt-3 border-t border-gray-700">
-                                <div>
-                                    <span className="text-xs text-gray-500">Price per day</span>
-                                    <p className="text-xl font-bold text-orange-400">₹{item.pricePerDay.toLocaleString()}</p>
+
+                            <div className="p-5">
+                                <div className="flex justify-between items-start mb-3">
+                                    <div>
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <span className="flex items-center gap-1 text-xs px-2 py-0.5 bg-gray-700 rounded-full text-gray-300">
+                                                {getCategoryIcon(item.category)} {getCategoryLabel(item.category)}
+                                            </span>
+                                        </div>
+                                        <h3 className="text-lg font-semibold text-white">{item.name}</h3>
+                                        <p className="text-xs text-gray-500 font-mono mt-1">{item.code}</p>
+                                    </div>
+                                    <div className="flex gap-1">
+                                        <button
+                                            onClick={() => handleToggleStatus(item.id, item.isActive)}
+                                            className="p-1.5 text-gray-400 hover:text-green-400 hover:bg-green-500/20 rounded-lg transition"
+                                            title={item.isActive ? "Deactivate" : "Activate"}
+                                        >
+                                            {item.isActive ? <CheckCircle size={16} /> : <XCircle size={16} />}
+                                        </button>
+                                        <Link href={`/admin/rental-items/${item.id}/edit`}>
+                                            <button className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition">
+                                                <Edit size={16} />
+                                            </button>
+                                        </Link>
+                                        <button
+                                            onClick={() => handleDelete(item.id, item.name)}
+                                            className="p-1.5 text-gray-400 hover:text-red-400 hover:bg-red-500/20 rounded-lg transition"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                    </div>
                                 </div>
-                                <button className="px-3 py-1.5 bg-gray-700 rounded-lg text-sm text-gray-300 hover:bg-gray-600">Edit</button>
+                                <p className="text-sm text-gray-400 mb-3 line-clamp-2">{item.description}</p>
+                                <div className="flex justify-between items-center pt-3 border-t border-gray-700">
+                                    <div>
+                                        <span className="text-xs text-gray-500">Rental (3 days)</span>
+                                        <p className="text-xl font-bold text-orange-400">₹{item.costFor3Days.toLocaleString()}</p>
+                                    </div>
+                                    <Link href={`/admin/rental-items/${item.id}/edit`}>
+                                        <button className="px-3 py-1.5 bg-gray-700 rounded-lg text-sm text-gray-300 hover:bg-gray-600 transition">
+                                            Edit
+                                        </button>
+                                    </Link>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                ))}
-            </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }

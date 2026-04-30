@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Providers } from "./providers";
+import { Toaster } from "react-hot-toast";
 
 const bebas = Bebas_Neue({
   subsets: ["latin"],
@@ -45,7 +46,9 @@ export default function RootLayout({
         {/* ✅ IMPORTANT: spacing for fixed header */}
        
            {!hideHeaderFooter && <Header />}
-        <Providers>{children}</Providers>
+        <Providers>{children}
+          <Toaster position="top-right" />
+        </Providers>
 
       
 

@@ -1,6 +1,7 @@
+// app/dashboard/booth-details/page.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   MapPinIcon,
@@ -14,6 +15,8 @@ import {
   DocumentTextIcon,
   ShieldCheckIcon
 } from '@heroicons/react/24/outline';
+import { boothAPI } from '@/lib/api/exhibitorClient';
+import toast from 'react-hot-toast';
 
 interface BoothDetails {
   boothNo: string;
@@ -41,7 +44,7 @@ function SuccessPage({ onBack }: { onBack: () => void }) {
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Booth Details Saved!</h2>
         <p className="text-gray-600 mb-6">Your booth and contractor details have been saved successfully.</p>
         <button onClick={onBack} className="px-6 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition">
-          Back to Requirements
+          Back to Stalls
         </button>
       </div>
     </div>
@@ -66,30 +69,139 @@ export default function BoothDetailsPage() {
     contractorPAN: '',
   });
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Basic validation for required fields
-    if (!formData.boothNo || !formData.sqMtrBooked || !formData.organisation || !formData.contactPerson || !formData.mobile || !formData.email) {
-      alert('Please fill all required fields');
-      return;
+  // Transform backend data to form format
+  const transformBackendToForm = (backendData: any): BoothDetails => {
+    // Extract size number from strings like "9m x 9m" or "48 sq.m"
+    let sqMtrBooked = '';
+    if (backendData.size) {
+      const match = backendData.size.match(/\d+/);
+      if (match) {
+        sqMtrBooked = match[0];
+      }
+    } else if (backendData.sqMtrBooked) {
+      sqMtrBooked = backendData.sqMtrBooked;
     }
-    if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
-      alert('Please enter a valid email address');
-      return;
-    }
-    setSubmitted(true);
+
+    return {
+      boothNo: backendData.boothNumber || backendData.boothNo || '',
+      sqMtrBooked: sqMtrBooked,
+      organisation: backendData.organisation || '',
+      contactPerson: backendData.contactPerson || '',
+      designation: backendData.designation || '',
+      mobile: backendData.mobile || '',
+      email: backendData.email || '',
+      contractorCompany: backendData.contractorCompany || '',
+      contractorPerson: backendData.contractorPerson || '',
+      contractorMobile: backendData.contractorMobile || '',
+      contractorEmail: backendData.contractorEmail || '',
+      contractorGST: backendData.contractorGST || '',
+      contractorPAN: backendData.contractorPAN || '',
+    };
   };
 
+  // Transform form data to backend format
+  const transformFormToBackend = (formData: BoothDetails) => {
+    return {
+      boothNumber: formData.boothNo,
+      size: `${formData.sqMtrBooked} sq.m`,
+      type: 'Standard',
+      dimensions: '',
+      notes: '',
+      price: (parseInt(formData.sqMtrBooked) * 2500).toString(),
+      status: 'pending',
+      organisation: formData.organisation,
+      contactPerson: formData.contactPerson,
+      designation: formData.designation,
+      mobile: formData.mobile,
+      email: formData.email,
+      contractorCompany: formData.contractorCompany,
+      contractorPerson: formData.contractorPerson,
+      contractorMobile: formData.contractorMobile,
+      contractorEmail: formData.contractorEmail,
+      contractorGST: formData.contractorGST,
+      contractorPAN: formData.contractorPAN,
+    };
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!formData.boothNo || !formData.sqMtrBooked || !formData.organisation ||
+      !formData.contactPerson || !formData.mobile || !formData.email) {
+      toast.error('Please fill all required fields');
+      return;
+    }
+
+    if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const backendData = transformFormToBackend(formData);
+      const result = await boothAPI.saveDetails(backendData);
+
+      if (result.success) {
+        setSubmitted(true);
+        toast.success('Booth details saved successfully!');
+      } else {
+        toast.error(result.error || 'Failed to save booth details');
+      }
+    } catch (error) {
+      console.error('Error saving booth details:', error);
+      toast.error('Failed to save booth details');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch existing booth details on load
+  useEffect(() => {
+    const fetchBoothDetails = async () => {
+      try {
+        setFetching(true);
+        const result = await boothAPI.getDetails();
+
+        if (result.success && result.data) {
+          // Transform backend data to form format
+          const transformedData = transformBackendToForm(result.data);
+          setFormData(transformedData);
+        }
+      } catch (error: any) {
+        console.error('Error fetching booth details:', error);
+        // If 404, it's fine - means no existing data
+        if (error.response?.status !== 404) {
+          toast.error('Failed to load existing booth details');
+        }
+      } finally {
+        setFetching(false);
+      }
+    };
+
+    fetchBoothDetails();
+  }, []);
+
   const handleBack = () => {
-    router.push('/dashboard/requirements');
+    router.push('/dashboard/my-stalls');
   };
 
   if (submitted) return <SuccessPage onBack={handleBack} />;
+
+  if (fetching) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-5xl mx-auto">
@@ -122,19 +234,19 @@ export default function BoothDetailsPage() {
                 value={formData.boothNo}
                 onChange={handleChange}
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500"
-                placeholder="e.g., T-42"
+                placeholder="e.g., A-101"
                 required
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Square Meters Booked *</label>
               <input
-                type="text"
+                type="number"
                 name="sqMtrBooked"
                 value={formData.sqMtrBooked}
                 onChange={handleChange}
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500"
-                placeholder="e.g., 48 sq.m"
+                placeholder="e.g., 48"
                 required
               />
             </div>
@@ -332,16 +444,17 @@ export default function BoothDetailsPage() {
         <div className="flex gap-4">
           <button
             type="button"
-            onClick={() => router.push('/dashboard/requirements')}
+            onClick={() => router.push('/dashboard/my-stalls')}
             className="px-6 py-3 border border-gray-300 text-gray-600 font-semibold rounded-xl hover:bg-gray-50 transition"
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="flex-1 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold rounded-xl hover:from-amber-600 hover:to-orange-600 transition"
+            disabled={loading}
+            className="flex-1 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold rounded-xl hover:from-amber-600 hover:to-orange-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Save Booth Details
+            {loading ? 'Saving...' : 'Save Booth Details'}
           </button>
         </div>
       </form>

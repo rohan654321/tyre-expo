@@ -1,9 +1,8 @@
-// app/admin/layout.tsx - UPDATED FIXED VERSION
+// app/admin/layout.tsx
 "use client";
 
-import { useAuth } from "@/hooks/useAuth";
-import { useRouter, usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import AdminShell from "./AdminShell";
 
 export default function AdminLayout({
@@ -11,50 +10,46 @@ export default function AdminLayout({
 }: {
     children: React.ReactNode;
 }) {
-    const { isAuthenticated, loading } = useAuth();
-    const router = useRouter();
     const pathname = usePathname();
+    const router = useRouter();
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
     useEffect(() => {
-        console.log("AdminLayout - isAuthenticated:", isAuthenticated);
-        console.log("AdminLayout - loading:", loading);
-        console.log("AdminLayout - pathname:", pathname);
+        const checkAuth = () => {
+            const token = localStorage.getItem("adminToken");
+            const user = localStorage.getItem("adminUser");
 
-        // Don't redirect if we're on login page
-        if (pathname === "/admin/login") {
-            return;
-        }
+            const hasAuth = !!(token && user);
+            setIsAuthenticated(hasAuth);
 
-        if (!loading && !isAuthenticated) {
-            console.log("Redirecting to login...");
-            router.replace("/admin/login");
-        }
-    }, [loading, isAuthenticated, router, pathname]);
+            // Only redirect if not on login page and not authenticated
+            if (!hasAuth && pathname !== "/admin/login") {
+                router.replace("/admin/login");
+            }
+        };
 
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center h-screen bg-gradient-to-br from-gray-900 to-gray-800">
-                <div className="text-center">
-                    <div className="relative">
-                        <div className="h-16 w-16 rounded-full border-4 border-orange-500/20"></div>
-                        <div className="absolute top-0 left-0 h-16 w-16 rounded-full border-4 border-orange-500 border-t-transparent animate-spin"></div>
-                    </div>
-                    <p className="mt-4 text-gray-400 font-medium">Loading admin panel...</p>
-                </div>
-            </div>
-        );
-    }
+        checkAuth();
+    }, [pathname, router]);
 
-    // Show login page without shell
+    // Don't wrap login page with AdminShell
     if (pathname === "/admin/login") {
         return <>{children}</>;
     }
 
-    // If not authenticated and not on login page, show nothing while redirecting
+    // Show nothing while checking auth
+    if (isAuthenticated === null) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-orange-500 border-t-transparent"></div>
+            </div>
+        );
+    }
+
+    // Not authenticated, don't render shell
     if (!isAuthenticated) {
         return null;
     }
 
-    // Show shell with children for authenticated users
+    // Authenticated, render shell
     return <AdminShell>{children}</AdminShell>;
 }

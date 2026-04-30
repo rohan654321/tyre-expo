@@ -1,126 +1,239 @@
+// app/dashboard/floor-layout/page.tsx
 'use client';
 
-import { useState } from 'react';
-import { MapIcon, ArrowsPointingOutIcon, MagnifyingGlassPlusIcon, MagnifyingGlassMinusIcon } from '@heroicons/react/24/outline';
+import { useState, useEffect } from 'react';
+import { floorPlanAPI } from '@/lib/api/exhibitorClient';
+import {
+  ArrowsPointingOutIcon,
+  MagnifyingGlassPlusIcon,
+  MagnifyingGlassMinusIcon
+} from '@heroicons/react/24/outline';
+
+interface FloorPlanData {
+  id: number;
+  name: string;
+  imageUrl?: string;  // Changed from baseImageUrl
+  baseImageUrl?: string; // Keep for compatibility
+  imageWidth?: number;
+  imageHeight?: number;
+  boothPositions?: any[];
+}
 
 export default function FloorLayoutPage() {
   const [zoom, setZoom] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [floorPlan, setFloorPlan] = useState<FloorPlanData | null>(null);
 
-  // Mock floor plan data with booths
-  const booths = [
-    { id: 'T-41', name: 'TyreTech Industries', x: 50, y: 100, width: 80, height: 60, status: 'booked' },
-    { id: 'T-42', name: 'Your Booth', x: 150, y: 100, width: 80, height: 60, status: 'your-booth' },
-    { id: 'T-43', name: 'RubberMasters', x: 250, y: 100, width: 80, height: 60, status: 'booked' },
-    { id: 'T-44', name: 'TyrePro', x: 350, y: 100, width: 80, height: 60, status: 'available' },
-    { id: 'T-45', name: 'WheelTech', x: 450, y: 100, width: 80, height: 60, status: 'available' },
-    { id: 'T-46', name: 'AutoTreads', x: 100, y: 200, width: 80, height: 60, status: 'booked' },
-    { id: 'T-47', name: 'SpeedGrip', x: 200, y: 200, width: 80, height: 60, status: 'available' },
-    { id: 'T-48', name: 'TyreWorld', x: 300, y: 200, width: 80, height: 60, status: 'booked' },
-  ];
+  useEffect(() => {
+    fetchFloorPlanImage();
+  }, []);
 
-  const getBoothColor = (status: string) => {
-    switch (status) {
-      case 'your-booth': return 'bg-gradient-to-r from-amber-400 to-orange-500 border-2 border-amber-600 shadow-lg';
-      case 'booked': return 'bg-blue-100 border border-blue-300';
-      case 'available': return 'bg-green-50 border border-green-200';
-      default: return 'bg-gray-100 border border-gray-200';
+  const fetchFloorPlanImage = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      console.log('Fetching floor plan from API...');
+      const result = await floorPlanAPI.get();
+      console.log('Floor plan response:', result);
+
+      if (result.success && result.data) {
+        // Map the API response to our FloorPlanData interface
+        const apiData = result.data as any;
+
+        const floorPlanData: FloorPlanData = {
+          id: apiData.id,
+          name: apiData.name || 'Hall A - Tyre Pavilion | Ground Floor',
+          // Handle different possible property names from API
+          imageUrl: apiData.imageUrl || apiData.baseImageUrl,
+          baseImageUrl: apiData.baseImageUrl || apiData.imageUrl,
+          imageWidth: apiData.imageWidth || apiData.width,
+          imageHeight: apiData.imageHeight || apiData.height,
+          boothPositions: apiData.boothPositions
+        };
+
+        if (floorPlanData.imageUrl || floorPlanData.baseImageUrl) {
+          setFloorPlan(floorPlanData);
+          console.log('Image URL found:', floorPlanData.imageUrl || floorPlanData.baseImageUrl);
+        } else {
+          setError('No floor plan image available');
+        }
+      } else {
+        setError(result.error || 'No floor plan image available');
+      }
+    } catch (err: any) {
+      console.error('Error fetching floor plan:', err);
+      setError(err.response?.data?.error || err.message || 'Failed to load floor plan image');
+    } finally {
+      setLoading(false);
     }
   };
+
+  const handleZoomIn = () => {
+    setZoom(Math.min(2, zoom + 0.1));
+  };
+
+  const handleZoomOut = () => {
+    setZoom(Math.max(0.5, zoom - 0.1));
+  };
+
+  const handleResetZoom = () => {
+    setZoom(1);
+  };
+
+  // Get the image URL from either property
+  const getImageUrl = () => {
+    return floorPlan?.imageUrl || floorPlan?.baseImageUrl;
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading floor plan...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+        <p className="text-red-600">{error}</p>
+        <button
+          onClick={fetchFloorPlanImage}
+          className="mt-4 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  if (!floorPlan || !getImageUrl()) {
+    return (
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
+        <p className="text-yellow-600">No floor plan image has been uploaded yet.</p>
+        <p className="text-sm text-gray-500 mt-2">Please contact the administrator to upload the floor plan.</p>
+        <button
+          onClick={fetchFloorPlanImage}
+          className="mt-4 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition"
+        >
+          Refresh
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Exhibition Floor Layout</h1>
-        <p className="text-gray-500 mt-1">Hall A - Tyre Pavilion | Ground Floor</p>
+        <p className="text-gray-500 mt-1">{floorPlan.name}</p>
       </div>
 
       {/* Controls */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <button className="p-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50">
+          <button
+            onClick={handleResetZoom}
+            className="p-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+            title="Reset zoom"
+          >
             <ArrowsPointingOutIcon className="h-5 w-5 text-gray-600" />
           </button>
           <div className="flex items-center gap-1 bg-white border border-gray-200 rounded-lg">
-            <button onClick={() => setZoom(Math.max(0.5, zoom - 0.1))} className="p-2 hover:bg-gray-50 rounded-l-lg">
+            <button
+              onClick={handleZoomOut}
+              className="p-2 hover:bg-gray-50 rounded-l-lg transition"
+              title="Zoom out"
+            >
               <MagnifyingGlassMinusIcon className="h-5 w-5 text-gray-600" />
             </button>
-            <span className="px-3 text-sm">{Math.round(zoom * 100)}%</span>
-            <button onClick={() => setZoom(Math.min(2, zoom + 0.1))} className="p-2 hover:bg-gray-50 rounded-r-lg">
+            <span className="px-3 text-sm min-w-[60px] text-center">
+              {Math.round(zoom * 100)}%
+            </span>
+            <button
+              onClick={handleZoomIn}
+              className="p-2 hover:bg-gray-50 rounded-r-lg transition"
+              title="Zoom in"
+            >
               <MagnifyingGlassPlusIcon className="h-5 w-5 text-gray-600" />
             </button>
           </div>
         </div>
-        <div className="flex items-center gap-4 text-sm">
-          <div className="flex items-center gap-2"><div className="w-4 h-4 bg-gradient-to-r from-amber-400 to-orange-500 rounded"></div><span>Your Booth</span></div>
-          <div className="flex items-center gap-2"><div className="w-4 h-4 bg-blue-100 border border-blue-300 rounded"></div><span>Booked</span></div>
-          <div className="flex items-center gap-2"><div className="w-4 h-4 bg-green-50 border border-green-200 rounded"></div><span>Available</span></div>
+
+        <div className="text-sm text-gray-500">
+          Click and drag to pan | Use buttons to zoom
         </div>
       </div>
 
-      {/* Floor Plan Canvas */}
+      {/* Floor Plan Image Container */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 overflow-auto">
-        <div className="relative" style={{ minWidth: '800px', minHeight: '500px' }}>
-          {/* Background grid */}
-          <div className="absolute inset-0 bg-gray-50" style={{ backgroundImage: 'radial-gradient(circle, #ddd 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
-          
-          {/* Hall Label */}
-          <div className="absolute top-2 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-4 py-1 rounded-full text-sm">
-            HALL A - TYRE PAVILION
-          </div>
-
-          {/* Aisle */}
-          <div className="absolute left-0 right-0 top-48 h-16 bg-gray-200 flex items-center justify-center">
-            <span className="text-gray-500 text-sm">Main Aisle (8m width)</span>
-          </div>
-
-          {/* Booths */}
-          {booths.map((booth) => (
-            <div
-              key={booth.id}
-              className={`absolute ${getBoothColor(booth.status)} rounded-lg p-2 cursor-pointer transition-all hover:shadow-md`}
-              style={{
-                left: booth.x * zoom,
-                top: booth.y * zoom,
-                width: booth.width * zoom,
-                height: booth.height * zoom,
-              }}
-            >
-              <div className="text-center">
-                <p className="text-xs font-semibold">{booth.id}</p>
-                {booth.status === 'your-booth' && (
-                  <p className="text-[10px] text-white font-medium">Your Booth</p>
-                )}
-              </div>
-            </div>
-          ))}
-
-          {/* Legend Box */}
-          <div className="absolute bottom-4 right-4 bg-white rounded-lg shadow-md p-3 text-xs border">
-            <p className="font-semibold mb-1">Hall Specifications</p>
-            <p>Total Area: 2,500 sq.m</p>
-            <p>Total Booths: 48</p>
-            <p>Aisle Width: 8m</p>
-            <p>Ceiling Height: 6m</p>
-          </div>
+        <div
+          className="relative overflow-hidden"
+          style={{
+            minWidth: '100%',
+            minHeight: '500px',
+            cursor: 'grab',
+            background: '#f5f5f5',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}
+        >
+          <img
+            src={getImageUrl()}
+            alt={floorPlan.name || "Exhibition Floor Plan"}
+            className="transition-transform duration-200 ease-out"
+            style={{
+              transform: `scale(${zoom})`,
+              transformOrigin: 'top left',
+              width: floorPlan.imageWidth ? `${floorPlan.imageWidth}px` : '100%',
+              height: 'auto',
+              objectFit: 'contain'
+            }}
+            onError={(e) => {
+              console.error('Image failed to load:', getImageUrl());
+              setError('Failed to load floor plan image. Please check the image URL.');
+            }}
+            onLoad={() => {
+              console.log('Image loaded successfully');
+            }}
+          />
         </div>
       </div>
 
-      {/* Booth Details */}
+      {/* Floor Plan Information */}
       <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl p-5 border border-amber-100">
         <div className="flex items-start gap-4">
           <div className="p-3 bg-white rounded-xl shadow-sm">
-            <MapIcon className="h-6 w-6 text-amber-600" />
+            <svg className="h-6 w-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+            </svg>
           </div>
           <div>
-            <h3 className="font-semibold text-gray-800">Your Booth Location</h3>
+            <h3 className="font-semibold text-gray-800">Hall Information</h3>
             <p className="text-sm text-gray-600 mt-1">
-              <strong>Booth Number:</strong> T-42 | <strong>Hall:</strong> Hall A | <strong>Section:</strong> Tyre Pavilion
+              <strong>Hall:</strong> Hall A | <strong>Pavilion:</strong> Tyre Pavilion | <strong>Floor:</strong> Ground Floor
             </p>
-            <p className="text-sm text-gray-600">
-              <strong>Dimensions:</strong> 8m x 6m (48 sq.m) | <strong>Power:</strong> 3-Phase Available
-            </p>
-            <button className="mt-3 text-sm text-amber-600 font-medium hover:text-amber-700">
-              View Booth Specifications →
+            {floorPlan.imageWidth && floorPlan.imageHeight && (
+              <p className="text-sm text-gray-600">
+                <strong>Image Dimensions:</strong> {floorPlan.imageWidth} x {floorPlan.imageHeight} pixels
+              </p>
+            )}
+            {floorPlan.boothPositions && floorPlan.boothPositions.length > 0 && (
+              <p className="text-sm text-gray-600">
+                <strong>Total Booths:</strong> {floorPlan.boothPositions.length}
+              </p>
+            )}
+            <button
+              onClick={fetchFloorPlanImage}
+              className="mt-3 text-sm text-amber-600 font-medium hover:text-amber-700 transition"
+            >
+              Refresh Floor Plan →
             </button>
           </div>
         </div>

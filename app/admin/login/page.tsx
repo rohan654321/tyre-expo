@@ -1,47 +1,46 @@
-// app/admin/login/page.tsx - UPDATED FIXED VERSION
+// app/admin/login/page.tsx
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, LogIn, Truck } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
+import { Eye, EyeOff, LogIn, Truck, AlertCircle } from "lucide-react";
+import { adminLogin } from "@/lib/api/auth";
 
 export default function AdminLoginPage() {
     const router = useRouter();
-    const { login, isAuthenticated } = useAuth();
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const [email, setEmail] = useState("admin@example.com");
+    const [password, setPassword] = useState("admin123");
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    // If already authenticated, redirect to dashboard
-    if (isAuthenticated) {
-        router.push("/admin/dashboard");
-        return null;
-    }
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
-        if (!email || !password) {
-            setError("Please enter email and password");
-            return;
-        }
-
         setLoading(true);
         setError("");
 
         try {
-            await login(email, password);
-            console.log("Login successful, redirecting...");
-            // Force a small delay to ensure state updates
-            setTimeout(() => {
+            console.log("📡 Attempting login...");
+
+            const result = await adminLogin(email, password);
+
+            if (result.success) {
+                console.log("✅ Login successful!");
+
+                // Verify token was stored
+                const storedToken = localStorage.getItem('adminToken');
+                const storedUser = localStorage.getItem('adminUser');
+                console.log("🔑 Token stored:", storedToken ? "Yes" : "No");
+                console.log("👤 User stored:", storedUser ? "Yes" : "No");
+
+                // Redirect to dashboard
                 router.push("/admin/dashboard");
-            }, 100);
-        } catch (err) {
-            setError("Login failed. Please try again.");
-            console.error(err);
+            } else {
+                setError(result.error || "Login failed");
+            }
+        } catch (err: any) {
+            console.error("❌ Login error:", err);
+            setError(err.message || "Login failed. Please check your credentials.");
         } finally {
             setLoading(false);
         }
@@ -50,16 +49,14 @@ export default function AdminLoginPage() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4">
             <div className="max-w-md w-full">
-                {/* Logo */}
                 <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center p-3 bg-gradient-to-r from-orange-500 to-red-600 rounded-2xl shadow-lg mb-4">
-                        <Truck className="h-8 w-8 text-white" />
+                    <div className="inline-flex items-center justify-center p-4 bg-gradient-to-r from-orange-500 to-red-600 rounded-2xl shadow-lg mb-4">
+                        <Truck className="h-10 w-10 text-white" />
                     </div>
                     <h1 className="text-3xl font-bold text-white">TyreExpo Admin</h1>
                     <p className="text-gray-400 mt-2">Tyre Exhibition Management System</p>
                 </div>
 
-                {/* Login Card */}
                 <div className="bg-white/10 backdrop-blur-xl rounded-2xl shadow-2xl p-8 border border-white/20">
                     <h2 className="text-2xl font-semibold text-white mb-6">Welcome Back</h2>
 
@@ -73,7 +70,7 @@ export default function AdminLoginPage() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 className="w-full px-4 py-3 bg-white/5 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition"
-                                placeholder="admin@tyreexpo.com"
+                                placeholder="admin@example.com"
                                 required
                             />
                         </div>
@@ -102,15 +99,16 @@ export default function AdminLoginPage() {
                         </div>
 
                         {error && (
-                            <div className="bg-red-500/20 border border-red-500 rounded-lg p-3 text-red-300 text-sm">
-                                {error}
+                            <div className="bg-red-500/20 border border-red-500 rounded-lg p-3 flex items-start gap-2">
+                                <AlertCircle size={18} className="text-red-400 mt-0.5 flex-shrink-0" />
+                                <span className="text-red-300 text-sm">{error}</span>
                             </div>
                         )}
 
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white font-semibold rounded-xl hover:from-orange-600 hover:to-red-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                            className="w-full py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white font-semibold rounded-xl hover:from-orange-600 hover:to-red-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {loading ? (
                                 <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
@@ -123,9 +121,9 @@ export default function AdminLoginPage() {
                         </button>
                     </form>
 
-                    <div className="mt-6 text-center">
-                        <p className="text-gray-400 text-sm">
-                            Demo credentials: any email & password
+                    <div className="mt-6 pt-4 border-t border-gray-700">
+                        <p className="text-gray-400 text-sm text-center">
+                            Use: <span className="text-orange-400">admin@example.com</span> / <span className="text-orange-400">admin123</span>
                         </p>
                     </div>
                 </div>

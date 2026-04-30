@@ -1,12 +1,18 @@
-'use client';
+// app/exhibitor/login/page.tsx
+"use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { EyeIcon, EyeSlashIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
+import toast from 'react-hot-toast';
+import { authAPI } from '@/lib/api/exhibitorClient';
 
-export default function LoginPage() {
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+
+export default function ExhibitorLoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -15,29 +21,51 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
 
+  // Check if already logged in
+  useEffect(() => {
+    const token = localStorage.getItem('exhibitorToken');
+    if (token) {
+      router.push('/dashboard');
+    }
+  }, [router]);
+
+  // app/exhibitor/login/page.tsx (update the handleSubmit function)
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      if (email && password) {
-        // Mock successful login
-        localStorage.setItem('tyre_expo_token', 'mock_token_123');
-        localStorage.setItem('tyre_exhibitor_data', JSON.stringify({
-          id: '1',
-          company: 'TyreTech Industries',
-          email: email,
-          name: 'Rajesh Kumar',
-          boothNumber: 'T-42'
-        }));
+    if (!email || !password) {
+      setError('Please enter email and password');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const data = await authAPI.login(email, password);
+
+      if (data.success) {
+        const { token, exhibitor } = data.data;
+
+        // Store token - use both keys for compatibility
+        localStorage.setItem('tyre_expo_token', token);
+        localStorage.setItem('exhibitorToken', token);
+        localStorage.setItem('exhibitorData', JSON.stringify(exhibitor));
+
+        toast.success(`Welcome back, ${exhibitor.name || exhibitor.company}!`);
         router.push('/dashboard');
       } else {
-        setError('Please enter email and password');
+        setError(data.error || 'Login failed. Please check your credentials.');
+        toast.error(data.error || 'Login failed');
       }
+    } catch (err: any) {
+      console.error('Login error:', err);
+      setError(err.response?.data?.error || err.message || 'Network error. Please try again.');
+      toast.error('Network error. Please check your connection.');
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   const handleDemoLogin = () => {
@@ -55,11 +83,11 @@ export default function LoginPage() {
 
       {/* Login Card */}
       <div className="relative w-full max-w-md">
-        <div className="bg-white/10 backdrop-blur-xl p-8">
+        <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-8 shadow-2xl border border-white/20">
           {/* Logo & Brand */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-100 h-20 mb-4">
-            <Image src="/ITS_logo_white.png" alt="Tyre Expo Logo" width={100} height={80} />
+              <Image src="/ITS_logo_white.png" alt="Tyre Expo Logo" width={100} height={80} />
             </div>
             <h2 className="text-3xl font-bold text-white">INDIA TYRE SHOW 2027</h2>
             <p className="text-gray-300 mt-2">Exhibitor Portal Login</p>
@@ -119,7 +147,7 @@ export default function LoginPage() {
                 />
                 <span className="text-sm text-gray-300">Remember me</span>
               </label>
-              <Link href="/forgot-password" className="text-sm text-amber-400 hover:text-amber-300 transition">
+              <Link href="/exhibitor/forgot-password" className="text-sm text-amber-400 hover:text-amber-300 transition">
                 Forgot password?
               </Link>
             </div>
@@ -153,6 +181,15 @@ export default function LoginPage() {
             </button>
           </div>
 
+          {/* Register Link */}
+          <div className="mt-4 text-center">
+            <p className="text-xs text-gray-400">
+              Don't have an account?{' '}
+              <Link href="/exhibitor/register" className="text-amber-400 hover:text-amber-300 transition">
+                Register as Exhibitor
+              </Link>
+            </p>
+          </div>
         </div>
 
         <p className="text-center text-gray-500 text-xs mt-8">

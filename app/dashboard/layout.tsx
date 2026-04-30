@@ -1,3 +1,4 @@
+// app/dashboard/layout.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -11,7 +12,6 @@ import {
   DocumentTextIcon,
   BookOpenIcon,
   CogIcon,
-  XMarkIcon,
   ArrowRightOnRectangleIcon,
   CreditCardIcon,
   BellIcon,
@@ -25,6 +25,9 @@ const navigation = [
   { name: 'Invoices', href: '/dashboard/invoice', icon: CreditCardIcon },
   { name: 'Floor Layout', href: '/dashboard/layout', icon: MapIcon },
   { name: 'My Stalls', href: '/dashboard/stall', icon: ShoppingCartIcon },
+  { name: 'Products', href: '/dashboard/products', icon: DocumentTextIcon },
+  { name: 'Brands', href: '/dashboard/brands', icon: DocumentTextIcon },
+  { name: 'Brochures', href: '/dashboard/brochures', icon: DocumentTextIcon },
   { name: 'Requirements', href: '/dashboard/requirements', icon: CogIcon },
   { name: 'Exhibitor Manual', href: '/dashboard/manual', icon: BookOpenIcon },
 ];
@@ -33,8 +36,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const pathname = usePathname();
   const router = useRouter();
+
+  // Check authentication
+  useEffect(() => {
+    const token = localStorage.getItem('tyre_expo_token') || localStorage.getItem('exhibitorToken');
+    if (!token) {
+      router.push('/login');
+    } else {
+      setIsAuthenticated(true);
+    }
+    setIsLoading(false);
+  }, [router]);
 
   // Check if window is defined (client-side only)
   useEffect(() => {
@@ -49,12 +65,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const handleLogout = () => {
     // Clear all localStorage items
     localStorage.removeItem('tyre_expo_token');
+    localStorage.removeItem('exhibitorToken');
+    localStorage.removeItem('exhibitorData');
     localStorage.removeItem('tyre_exhibitor_data');
     localStorage.removeItem('remember_me');
     localStorage.removeItem('last_invoice_id');
     localStorage.removeItem('last_requirements_id');
-    
-    // Redirect to login page (not dashboard/login)
+
+    // Redirect to login page
     router.push('/login');
   };
 
@@ -66,15 +84,26 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500"></div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
+
   const isOpen = isMobile ? mobileOpen : sidebarOpen;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-0 z-50 h-full bg-white shadow-2xl transition-all duration-300 ease-in-out ${
-          isOpen ? 'w-64' : 'w-20'
-        }`}
+        className={`fixed left-0 top-0 z-50 h-full bg-white shadow-2xl transition-all duration-300 ease-in-out ${isOpen ? 'w-64' : 'w-20'
+          }`}
       >
         {/* Logo */}
         <div className={`flex h-16 items-center justify-between border-b border-gray-100 px-4 ${!isOpen && 'justify-center'}`}>
@@ -114,16 +143,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <Link
                 key={item.name}
                 href={item.href}
-                className={`group mb-1 flex items-center rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
-                  isActive
+                className={`group mb-1 flex items-center rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${isActive
                     ? 'bg-gradient-to-r from-amber-50 to-orange-50 text-amber-700'
                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                } ${!isOpen && 'justify-center'}`}
+                  } ${!isOpen && 'justify-center'}`}
               >
                 <item.icon
-                  className={`h-5 w-5 ${!isOpen ? 'mr-0' : 'mr-3'} ${
-                    isActive ? 'text-amber-500' : 'text-gray-400 group-hover:text-gray-500'
-                  }`}
+                  className={`h-5 w-5 ${!isOpen ? 'mr-0' : 'mr-3'} ${isActive ? 'text-amber-500' : 'text-gray-400 group-hover:text-gray-500'
+                    }`}
                 />
                 {isOpen && <span>{item.name}</span>}
               </Link>
@@ -135,9 +162,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div className={`absolute bottom-0 left-0 right-0 border-t border-gray-100 p-4 ${!isOpen && 'text-center'}`}>
           <button
             onClick={handleLogout}
-            className={`flex w-full items-center rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50 ${
-              !isOpen && 'justify-center'
-            }`}
+            className={`flex w-full items-center rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50 ${!isOpen && 'justify-center'
+              }`}
           >
             <ArrowRightOnRectangleIcon className={`h-5 w-5 ${!isOpen ? 'mr-0' : 'mr-3'}`} />
             {isOpen && <span>Logout</span>}
