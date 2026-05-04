@@ -86,8 +86,8 @@ export default function EditFurniturePage() {
             toast.error("Description is required");
             return;
         }
-        if (!formData.cost3Days) {
-            toast.error("Rental price is required");
+        if (!formData.cost3Days || parseInt(formData.cost3Days) <= 0) {
+            toast.error("Valid rental price is required");
             return;
         }
 
@@ -111,7 +111,8 @@ export default function EditFurniturePage() {
             }
         } catch (error: any) {
             console.error("Update furniture error:", error);
-            toast.error(error.response?.data?.message || "Failed to update furniture");
+            const errorMsg = error.response?.data?.message || error.message || "Failed to update furniture";
+            toast.error(errorMsg);
         } finally {
             setLoading(false);
         }
@@ -146,7 +147,7 @@ export default function EditFurniturePage() {
                         </label>
                         <div className="border-2 border-dashed border-gray-600 rounded-lg p-4 text-center">
                             {(imagePreview || existingImage) ? (
-                                <div className="relative">
+                                <div className="relative inline-block">
                                     <img src={imagePreview || existingImage!} alt="Preview" className="max-h-48 mx-auto rounded-lg" />
                                     <button
                                         type="button"
@@ -175,7 +176,7 @@ export default function EditFurniturePage() {
                         </div>
                     </div>
 
-                    {/* Form Fields - Same as create page */}
+                    {/* Form Fields */}
                     <div className="space-y-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-300 mb-2">

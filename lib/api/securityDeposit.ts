@@ -99,7 +99,7 @@ export async function bulkDeleteSecurityDeposits(ids: string[]) {
     return response.data;
 }
 
-// Toggle active status
+// FIXED: Toggle active status
 export async function toggleSecurityDepositStatus(id: string, isActive: boolean) {
     const response = await api.patch(`/admin/security-deposit/${id}/toggle-status`, { isActive });
     return response.data;

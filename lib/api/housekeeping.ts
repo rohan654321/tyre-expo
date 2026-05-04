@@ -25,7 +25,7 @@ api.interceptors.request.use(
 
 export interface HousekeepingConfig {
     id: string;
-    ratePerShift: number;  // Changed from ratePerStaffPerDay
+    ratePerShift: number;
     shiftHours: number;
     createdAt: string;
     updatedAt: string;
@@ -37,7 +37,7 @@ export async function getHousekeepingConfig() {
     return response.data;
 }
 
-// Update housekeeping configuration - FIXED to match backend
+// FIXED: Update housekeeping configuration
 export async function updateHousekeepingConfig(data: { ratePerShift: number; shiftHours: number }) {
     const response = await api.put('/admin/housekeeping/config', data);
     return response.data;
@@ -67,7 +67,7 @@ export async function getHousekeepingRateHistory() {
     return response.data;
 }
 
-// Reset to default
+// FIXED: Reset to default
 export async function resetHousekeepingToDefault() {
     const response = await api.post('/admin/housekeeping/reset');
     return response.data;

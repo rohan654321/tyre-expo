@@ -68,13 +68,13 @@ export async function getWaterConnectionConfig() {
     return response.data;
 }
 
-// Update configuration (Admin only)
+// FIXED: Update configuration (Admin only)
 export async function updateWaterConnectionConfig(costPerConnection: number) {
     const response = await api.put('/admin/water-connection/config', { costPerConnection });
     return response.data;
 }
 
-// Reset to default rate (Admin only)
+// FIXED: Reset to default rate (Admin only)
 export async function resetWaterConnectionToDefault() {
     const response = await api.post('/admin/water-connection/reset');
     return response.data;

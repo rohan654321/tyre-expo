@@ -1,10 +1,9 @@
-// app/admin/rental-items/page.tsx - FIXED IMPORT
 "use client";
 
 import { useState, useEffect } from "react";
 import { Plus, Edit, Trash2, Search, Package, Tv, Printer, CheckCircle, XCircle, RefreshCw } from "lucide-react";
 import Link from "next/link";
-import { getRentalItems, deleteRentalItem, updateRentalItemStatus, getRentalItemStatistics, RentalItem } from "@/lib/api/rentalItems";
+import { getRentalItems, deleteRentalItem, updateRentalItemStatus, RentalItem } from "@/lib/api/rentalItems";
 import toast from "react-hot-toast";
 
 const categories = [
@@ -36,7 +35,16 @@ export default function AdminRentalItemsPage() {
     const [search, setSearch] = useState("");
     const [categoryFilter, setCategoryFilter] = useState("All");
     const [statusFilter, setStatusFilter] = useState("all");
-    const [statistics, setStatistics] = useState({ total: 0, active: 0, categories: 0 });
+    const [statistics, setStatistics] = useState({ total: 0, active: 0, inactive: 0, categories: 0 });
+
+    const calculateLocalStatistics = (itemsList: RentalItem[]) => {
+        const total = itemsList.length;
+        const active = itemsList.filter(item => item.isActive).length;
+        const inactive = total - active;
+        const uniqueCategories = new Set(itemsList.map(item => item.category)).size;
+
+        setStatistics({ total, active, inactive, categories: uniqueCategories });
+    };
 
     const fetchItems = async () => {
         try {
@@ -48,7 +56,11 @@ export default function AdminRentalItemsPage() {
             });
 
             if (response.success) {
-                setItems(response.data || []);
+                const fetchedItems = response.data || [];
+                setItems(fetchedItems);
+                calculateLocalStatistics(fetchedItems);
+            } else {
+                toast.error(response.message || "Failed to load rental items");
             }
         } catch (error) {
             console.error("Failed to fetch rental items:", error);
@@ -58,24 +70,8 @@ export default function AdminRentalItemsPage() {
         }
     };
 
-    const fetchStatistics = async () => {
-        try {
-            const response = await getRentalItemStatistics();
-            if (response.success) {
-                setStatistics({
-                    total: response.data.totalItems || 0,
-                    active: response.data.activeItems || 0,
-                    categories: response.data.categoriesCount || 0
-                });
-            }
-        } catch (error) {
-            console.error("Failed to fetch statistics:", error);
-        }
-    };
-
     useEffect(() => {
         fetchItems();
-        fetchStatistics();
     }, [categoryFilter, statusFilter]);
 
     const handleSearch = () => {
@@ -89,11 +85,11 @@ export default function AdminRentalItemsPage() {
                 if (response.success) {
                     toast.success("Rental item deleted successfully");
                     fetchItems();
-                    fetchStatistics();
                 } else {
                     toast.error(response.message || "Failed to delete");
                 }
             } catch (error) {
+                console.error("Delete error:", error);
                 toast.error("Failed to delete rental item");
             }
         }
@@ -104,19 +100,22 @@ export default function AdminRentalItemsPage() {
             const response = await updateRentalItemStatus(id, !currentStatus);
             if (response.success) {
                 toast.success(`Item ${!currentStatus ? 'activated' : 'deactivated'} successfully`);
-                fetchItems();
-                fetchStatistics();
+                const updatedItems = items.map(item =>
+                    item.id === id ? { ...item, isActive: !currentStatus } : item
+                );
+                setItems(updatedItems);
+                calculateLocalStatistics(updatedItems);
             } else {
                 toast.error(response.message || "Failed to update status");
             }
         } catch (error) {
+            console.error("Status update error:", error);
             toast.error("Failed to update status");
         }
     };
 
     return (
         <div className="space-y-6 p-6">
-            {/* Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h1 className="text-2xl font-bold text-white">AV & IT Rental Catalog</h1>
@@ -128,7 +127,6 @@ export default function AdminRentalItemsPage() {
                 </Link>
             </div>
 
-            {/* Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                 <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
                     <p className="text-2xl font-bold text-white">{statistics.total}</p>
@@ -139,7 +137,7 @@ export default function AdminRentalItemsPage() {
                     <p className="text-xs text-gray-400">Active</p>
                 </div>
                 <div className="bg-red-500/10 rounded-xl p-4 border border-red-500/30">
-                    <p className="text-2xl font-bold text-red-400">{statistics.total - statistics.active}</p>
+                    <p className="text-2xl font-bold text-red-400">{statistics.inactive}</p>
                     <p className="text-xs text-gray-400">Inactive</p>
                 </div>
                 <div className="bg-purple-500/10 rounded-xl p-4 border border-purple-500/30">
@@ -148,7 +146,6 @@ export default function AdminRentalItemsPage() {
                 </div>
             </div>
 
-            {/* Filters */}
             <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
                 <div className="flex flex-col sm:flex-row gap-4">
                     <div className="flex-1 relative">
@@ -190,7 +187,6 @@ export default function AdminRentalItemsPage() {
                 </div>
             </div>
 
-            {/* Items Grid */}
             {loading ? (
                 <div className="flex items-center justify-center min-h-[400px]">
                     <div className="animate-spin rounded-full h-12 w-12 border-4 border-orange-500 border-t-transparent"></div>
@@ -209,7 +205,6 @@ export default function AdminRentalItemsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {items.map((item) => (
                         <div key={item.id} className="bg-gray-800/50 rounded-xl border border-gray-700 overflow-hidden hover:border-orange-500/30 transition-all">
-                            {/* Image Section */}
                             <div className="h-48 bg-gray-700 relative">
                                 {item.imageUrl ? (
                                     <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
@@ -237,7 +232,10 @@ export default function AdminRentalItemsPage() {
                                     <div className="flex gap-1">
                                         <button
                                             onClick={() => handleToggleStatus(item.id, item.isActive)}
-                                            className="p-1.5 text-gray-400 hover:text-green-400 hover:bg-green-500/20 rounded-lg transition"
+                                            className={`p-1.5 rounded-lg transition ${item.isActive
+                                                    ? 'text-green-400 hover:text-red-400 hover:bg-red-500/20'
+                                                    : 'text-gray-400 hover:text-green-400 hover:bg-green-500/20'
+                                                }`}
                                             title={item.isActive ? "Deactivate" : "Activate"}
                                         >
                                             {item.isActive ? <CheckCircle size={16} /> : <XCircle size={16} />}

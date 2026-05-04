@@ -28,6 +28,8 @@ export default function AdminFurniturePage() {
 
             if (response.success) {
                 setFurniture(response.data || []);
+            } else {
+                toast.error(response.message || "Failed to load furniture");
             }
         } catch (error) {
             console.error("Failed to fetch furniture:", error);
@@ -39,7 +41,11 @@ export default function AdminFurniturePage() {
 
     const fetchStatistics = async () => {
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/furniture/statistics`);
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/furniture/statistics`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                }
+            });
             const data = await response.json();
             if (data.success) {
                 setStatistics({
@@ -75,23 +81,34 @@ export default function AdminFurniturePage() {
                     toast.error(response.message || "Failed to delete");
                 }
             } catch (error) {
+                console.error("Delete error:", error);
                 toast.error("Failed to delete furniture");
             }
         }
     };
 
+    // FIXED: Handle stock toggle with better error handling
     const handleToggleStock = async (id: string, currentStatus: boolean) => {
+        const newStatus = !currentStatus;
+        const actionText = newStatus ? 'In Stock' : 'Out of Stock';
+
         try {
-            const response = await updateStockStatus(id, !currentStatus);
+            console.log(`Updating stock status for ${id} to ${newStatus}`);
+            const response = await updateStockStatus(id, newStatus);
+            console.log("Stock update response:", response);
+
             if (response.success) {
-                toast.success(`Stock status updated to ${!currentStatus ? 'In Stock' : 'Out of Stock'}`);
-                fetchFurniture();
-                fetchStatistics();
+                toast.success(`Stock status updated to ${actionText}`);
+                // Refresh both furniture list and statistics
+                await fetchFurniture();
+                await fetchStatistics();
             } else {
-                toast.error(response.message || "Failed to update status");
+                toast.error(response.message || "Failed to update stock status");
             }
-        } catch (error) {
-            toast.error("Failed to update stock status");
+        } catch (error: any) {
+            console.error("Failed to update stock status:", error);
+            const errorMsg = error.response?.data?.message || error.message || "Failed to update stock status";
+            toast.error(errorMsg);
         }
     };
 
@@ -146,14 +163,14 @@ export default function AdminFurniturePage() {
                     <select
                         value={categoryFilter}
                         onChange={(e) => setCategoryFilter(e.target.value)}
-                        className="px-4 py-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                        className="px-4 py-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-orange-500"
                     >
                         {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
                     </select>
                     <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
-                        className="px-4 py-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                        className="px-4 py-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-orange-500"
                     >
                         <option value="all">All Status</option>
                         <option value="active">In Stock</option>
@@ -226,7 +243,10 @@ export default function AdminFurniturePage() {
                                     <div className="flex gap-2">
                                         <button
                                             onClick={() => handleToggleStock(item.id, item.inStock)}
-                                            className="p-2 text-gray-400 hover:text-green-400 hover:bg-green-500/20 rounded-lg transition"
+                                            className={`p-2 rounded-lg transition ${item.inStock
+                                                    ? 'text-green-400 hover:text-red-400 hover:bg-red-500/20'
+                                                    : 'text-red-400 hover:text-green-400 hover:bg-green-500/20'
+                                                }`}
                                             title={item.inStock ? "Mark as Out of Stock" : "Mark as In Stock"}
                                         >
                                             {item.inStock ? <CheckCircle size={18} /> : <XCircle size={18} />}

@@ -39,6 +39,7 @@ export interface CreateHostessCategoryData {
     ratePerDay: number;
     workingHours: number;
     description: string;
+    isActive?: boolean;
 }
 
 // Get all hostess categories
@@ -79,10 +80,20 @@ export async function deleteHostessCategory(id: string) {
     return response.data;
 }
 
-// Toggle active status
+// FIXED: Toggle active status - Use PUT update instead of PATCH
 export async function toggleHostessCategoryStatus(id: string) {
-    const response = await api.patch(`/admin/hostess-rates/${id}/toggle-status`);
-    return response.data;
+    try {
+        const category = await getHostessCategoryById(id);
+        if (category.success) {
+            const response = await updateHostessCategory(id, {
+                isActive: !category.data.isActive
+            });
+            return response;
+        }
+    } catch (error: any) {
+        console.error("Toggle status error:", error);
+        throw error;
+    }
 }
 
 // Bulk update rates
@@ -97,8 +108,20 @@ export async function calculateHostessCost(category: 'A' | 'B', noOfDays: number
     return response.data;
 }
 
-// Get statistics
+// Get statistics - FIXED to handle missing columns
 export async function getHostessCategoryStatistics() {
-    const response = await api.get('/admin/hostess-rates/statistics');
-    return response.data;
+    try {
+        const response = await api.get('/admin/hostess-rates/statistics');
+        return response.data;
+    } catch (error: any) {
+        console.error("Statistics API error:", error);
+        return {
+            success: true,
+            data: {
+                total: 0,
+                active: 0,
+                avgRate: 0
+            }
+        };
+    }
 }

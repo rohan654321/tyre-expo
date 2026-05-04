@@ -1,4 +1,3 @@
-// app/admin/security-deposit/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -13,7 +12,6 @@ import {
     updateSecurityDeposit,
     deleteSecurityDeposit,
     toggleSecurityDepositStatus,
-    getSecurityDepositStatistics,
     SecurityDeposit
 } from "@/lib/api/securityDeposit";
 import toast from "react-hot-toast";
@@ -48,6 +46,27 @@ export default function AdminSecurityDepositPage() {
         description: '',
     });
 
+    // Calculate statistics locally from deposits
+    const calculateLocalStatistics = (depositsList: SecurityDeposit[]) => {
+        const totalDeposits = depositsList.length;
+        const activeDeposits = depositsList.filter(d => d.isActive).length;
+        const inactiveDeposits = totalDeposits - activeDeposits;
+        const avgINR = depositsList.length > 0
+            ? depositsList.reduce((sum, d) => sum + d.amountINR, 0) / depositsList.length
+            : 0;
+        const avgUSD = depositsList.length > 0
+            ? depositsList.reduce((sum, d) => sum + d.amountUSD, 0) / depositsList.length
+            : 0;
+
+        setStatistics({
+            totalDeposits,
+            activeDeposits,
+            inactiveDeposits,
+            avgINR,
+            avgUSD
+        });
+    };
+
     const fetchDeposits = async () => {
         try {
             setLoading(true);
@@ -56,7 +75,11 @@ export default function AdminSecurityDepositPage() {
             });
 
             if (response.success) {
-                setDeposits(response.data || []);
+                const fetchedDeposits = response.data || [];
+                setDeposits(fetchedDeposits);
+                calculateLocalStatistics(fetchedDeposits);
+            } else {
+                toast.error(response.message || "Failed to load security deposits");
             }
         } catch (error) {
             console.error("Failed to fetch security deposits:", error);
@@ -66,27 +89,8 @@ export default function AdminSecurityDepositPage() {
         }
     };
 
-    const fetchStatistics = async () => {
-        try {
-            const response = await getSecurityDepositStatistics();
-            if (response.success) {
-                const stats = response.data;
-                setStatistics({
-                    totalDeposits: stats.totalDeposits || 0,
-                    activeDeposits: stats.activeDeposits || 0,
-                    inactiveDeposits: stats.inactiveDeposits || 0,
-                    avgINR: stats.priceStats?.avgINR || 0,
-                    avgUSD: stats.priceStats?.avgUSD || 0,
-                });
-            }
-        } catch (error) {
-            console.error("Failed to fetch statistics:", error);
-        }
-    };
-
     useEffect(() => {
         fetchDeposits();
-        fetchStatistics();
     }, [statusFilter]);
 
     const handleDelete = async (id: string, category: string) => {
@@ -96,7 +100,6 @@ export default function AdminSecurityDepositPage() {
                 if (response.success) {
                     toast.success("Security deposit tier deleted successfully");
                     fetchDeposits();
-                    fetchStatistics();
                 } else {
                     toast.error(response.message || "Failed to delete");
                 }
@@ -111,12 +114,17 @@ export default function AdminSecurityDepositPage() {
             const response = await toggleSecurityDepositStatus(id, !currentStatus);
             if (response.success) {
                 toast.success(`Tier ${!currentStatus ? 'activated' : 'deactivated'} successfully`);
-                fetchDeposits();
-                fetchStatistics();
+                // Update local state immediately
+                const updatedDeposits = deposits.map(deposit =>
+                    deposit.id === id ? { ...deposit, isActive: !currentStatus } : deposit
+                );
+                setDeposits(updatedDeposits);
+                calculateLocalStatistics(updatedDeposits);
             } else {
                 toast.error(response.message || "Failed to update status");
             }
         } catch (error) {
+            console.error("Toggle status error:", error);
             toast.error("Failed to update status");
         }
     };
@@ -171,7 +179,7 @@ export default function AdminSecurityDepositPage() {
                 </button>
             </div>
 
-            {/* Statistics Cards */}
+            {/* Statistics Cards - Now calculated locally */}
             <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 gap-4">
                 <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
                     <p className="text-2xl font-bold text-white">{statistics.totalDeposits}</p>
@@ -244,8 +252,7 @@ export default function AdminSecurityDepositPage() {
                                     <div>
                                         <div className="flex items-center gap-2 mb-1">
                                             <h3 className="text-xl font-bold text-white">{deposit.category} sq.m</h3>
-                                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${deposit.isActive ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'
-                                                }`}>
+                                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${deposit.isActive ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>
                                                 {deposit.isActive ? <CheckCircle size={10} /> : <XCircle size={10} />}
                                                 {deposit.isActive ? 'Active' : 'Inactive'}
                                             </span>
@@ -259,8 +266,8 @@ export default function AdminSecurityDepositPage() {
                                         <button
                                             onClick={() => handleToggleStatus(deposit.id, deposit.isActive)}
                                             className={`p-1.5 rounded-lg transition ${deposit.isActive
-                                                    ? 'text-gray-400 hover:text-red-400 hover:bg-red-500/20'
-                                                    : 'text-gray-400 hover:text-green-400 hover:bg-green-500/20'
+                                                ? 'text-gray-400 hover:text-red-400 hover:bg-red-500/20'
+                                                : 'text-gray-400 hover:text-green-400 hover:bg-green-500/20'
                                                 }`}
                                             title={deposit.isActive ? "Deactivate" : "Activate"}
                                         >
@@ -458,7 +465,8 @@ export default function AdminSecurityDepositPage() {
                                                 toast.success("Security deposit tier updated successfully");
                                                 setShowModal(false);
                                                 fetchDeposits();
-                                                fetchStatistics();
+                                            } else {
+                                                toast.error(response.message || "Failed to update");
                                             }
                                         } else {
                                             const response = await createSecurityDeposit({
@@ -475,10 +483,12 @@ export default function AdminSecurityDepositPage() {
                                                 toast.success("Security deposit tier created successfully");
                                                 setShowModal(false);
                                                 fetchDeposits();
-                                                fetchStatistics();
+                                            } else {
+                                                toast.error(response.message || "Failed to create");
                                             }
                                         }
                                     } catch (error: any) {
+                                        console.error("Operation error:", error);
                                         toast.error(error.response?.data?.message || "Operation failed");
                                     }
                                 }}

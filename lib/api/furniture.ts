@@ -1,4 +1,4 @@
-// lib/api/furniture.ts - UPDATED
+// lib/api/furniture.ts
 import axios from "axios";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
@@ -16,9 +16,6 @@ api.interceptors.request.use(
             const token = localStorage.getItem("adminToken");
             if (token) {
                 config.headers.Authorization = `Bearer ${token}`;
-                console.log("✅ Token added to request for:", config.url);
-            } else {
-                console.log("❌ No token found for:", config.url);
             }
         }
         return config;
@@ -49,13 +46,12 @@ export interface CreateFurnitureData {
     inStock: boolean;
 }
 
-// Get all furniture with filters - FIXED ENDPOINT
+// Get all furniture with filters
 export async function getFurniture(params?: {
     category?: string;
     inStock?: boolean;
     search?: string;
 }) {
-    console.log("📡 Fetching furniture from:", '/admin/furniture');
     const response = await api.get('/admin/furniture', { params });
     return response.data;
 }
@@ -66,9 +62,8 @@ export async function getFurnitureById(id: string) {
     return response.data;
 }
 
-// Create furniture - FIXED ENDPOINT
+// Create furniture with image
 export async function createFurniture(data: CreateFurnitureData, imageFile?: File) {
-    console.log("📡 Creating furniture at:", '/admin/furniture');
     const formData = new FormData();
     formData.append('code', data.code);
     formData.append('description', data.description);
@@ -86,7 +81,7 @@ export async function createFurniture(data: CreateFurnitureData, imageFile?: Fil
     return response.data;
 }
 
-// Update furniture
+// Update furniture with image
 export async function updateFurniture(id: string, data: Partial<CreateFurnitureData>, imageFile?: File) {
     const formData = new FormData();
     if (data.code) formData.append('code', data.code);
@@ -117,7 +112,7 @@ export async function bulkDeleteFurniture(ids: string[]) {
     return response.data;
 }
 
-// Update stock status
+// Update stock status - FIXED: Using PATCH method with correct endpoint
 export async function updateStockStatus(id: string, inStock: boolean) {
     const response = await api.patch(`/admin/furniture/${id}/stock`, { inStock });
     return response.data;

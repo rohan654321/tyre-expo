@@ -1,9 +1,8 @@
-// app/admin/electrical-rates/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
 import { Plus, Edit, Trash2, Save, X, BoltIcon, Calendar, CheckCircle, XCircle, Eye, Power, Zap } from "lucide-react";
-import { getElectricalRates, deleteElectricalRate, toggleElectricalRateStatus, getElectricalRateStatistics, ElectricalRate , updateElectricalRate, createElectricalRate} from "@/lib/api/electricalRates";
+import { getElectricalRates, deleteElectricalRate, toggleElectricalRateStatus, ElectricalRate, updateElectricalRate, createElectricalRate } from "@/lib/api/electricalRates";
 import toast from "react-hot-toast";
 
 export default function AdminElectricalRatesPage() {
@@ -11,6 +10,7 @@ export default function AdminElectricalRatesPage() {
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [editingRate, setEditingRate] = useState<ElectricalRate | null>(null);
+    // Calculate stats from rates instead of API
     const [statistics, setStatistics] = useState({ total: 0, active: 0, exhibition: 0, temporary: 0 });
     const [formData, setFormData] = useState({
         type: 'both' as 'temporary' | 'exhibition' | 'both',
@@ -20,12 +20,26 @@ export default function AdminElectricalRatesPage() {
         description: '',
     });
 
+    // Calculate statistics locally from rates array
+    const calculateLocalStatistics = (ratesList: ElectricalRate[]) => {
+        const total = ratesList.length;
+        const active = ratesList.filter(rate => rate.isActive).length;
+        const exhibition = ratesList.filter(rate => rate.type === 'exhibition' || rate.type === 'both').length;
+        const temporary = ratesList.filter(rate => rate.type === 'temporary' || rate.type === 'both').length;
+
+        setStatistics({ total, active, exhibition, temporary });
+    };
+
     const fetchRates = async () => {
         try {
             setLoading(true);
             const response = await getElectricalRates();
             if (response.success) {
-                setRates(response.data || []);
+                const fetchedRates = response.data || [];
+                setRates(fetchedRates);
+                calculateLocalStatistics(fetchedRates);
+            } else {
+                toast.error(response.message || "Failed to load electrical rates");
             }
         } catch (error) {
             console.error("Failed to fetch electrical rates:", error);
@@ -35,25 +49,8 @@ export default function AdminElectricalRatesPage() {
         }
     };
 
-    const fetchStatistics = async () => {
-        try {
-            const response = await getElectricalRateStatistics();
-            if (response.success) {
-                setStatistics({
-                    total: response.data.total || 0,
-                    active: response.data.active || 0,
-                    exhibition: response.data.exhibition || 0,
-                    temporary: response.data.temporary || 0,
-                });
-            }
-        } catch (error) {
-            console.error("Failed to fetch statistics:", error);
-        }
-    };
-
     useEffect(() => {
         fetchRates();
-        fetchStatistics();
     }, []);
 
     const handleDelete = async (id: string, ratePerKW: number) => {
@@ -63,11 +60,11 @@ export default function AdminElectricalRatesPage() {
                 if (response.success) {
                     toast.success("Electrical rate deleted successfully");
                     fetchRates();
-                    fetchStatistics();
                 } else {
                     toast.error(response.message || "Failed to delete");
                 }
             } catch (error) {
+                console.error("Delete error:", error);
                 toast.error("Failed to delete electrical rate");
             }
         }
@@ -78,17 +75,23 @@ export default function AdminElectricalRatesPage() {
             const response = await toggleElectricalRateStatus(id);
             if (response.success) {
                 toast.success(`Rate ${!currentStatus ? 'activated' : 'deactivated'} successfully`);
-                fetchRates();
-                fetchStatistics();
+                // Update local state immediately for better UX
+                const updatedRates = rates.map(rate =>
+                    rate.id === id ? { ...rate, isActive: !currentStatus } : rate
+                );
+                setRates(updatedRates);
+                calculateLocalStatistics(updatedRates);
             } else {
                 toast.error(response.message || "Failed to update status");
             }
         } catch (error) {
+            console.error("Toggle status error:", error);
             toast.error("Failed to update status");
         }
     };
 
     const formatDate = (dateString: string) => {
+        if (!dateString) return 'N/A';
         return new Date(dateString).toLocaleDateString('en-IN', {
             year: 'numeric',
             month: 'short',
@@ -106,6 +109,8 @@ export default function AdminElectricalRatesPage() {
                 return <span className="px-2 py-1 text-xs rounded-full bg-green-500/20 text-green-400 flex items-center gap-1"><Power size={12} /> Both</span>;
         }
     };
+
+    const formatCurrency = (amount: number) => `₹${amount.toLocaleString()}`;
 
     return (
         <div className="space-y-6 p-6">
@@ -139,7 +144,7 @@ export default function AdminElectricalRatesPage() {
                 </button>
             </div>
 
-            {/* Statistics Cards */}
+            {/* Statistics Cards - Calculated locally */}
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                 <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
                     <p className="text-2xl font-bold text-white">{statistics.total}</p>
@@ -198,7 +203,7 @@ export default function AdminElectricalRatesPage() {
                                             {getTypeBadge(rate.type)}
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className="text-xl font-bold text-orange-400">₹{rate.ratePerKW.toLocaleString()}</span>
+                                            <span className="text-xl font-bold text-orange-400">{formatCurrency(rate.ratePerKW)}</span>
                                             <span className="text-xs text-gray-500 ml-1">/KW</span>
                                         </td>
                                         <td className="px-6 py-4">
@@ -380,7 +385,8 @@ export default function AdminElectricalRatesPage() {
                                                 toast.success("Electrical rate updated successfully");
                                                 setShowModal(false);
                                                 fetchRates();
-                                                fetchStatistics();
+                                            } else {
+                                                toast.error(response.message || "Failed to update");
                                             }
                                         } else {
                                             const response = await createElectricalRate({
@@ -394,10 +400,12 @@ export default function AdminElectricalRatesPage() {
                                                 toast.success("Electrical rate created successfully");
                                                 setShowModal(false);
                                                 fetchRates();
-                                                fetchStatistics();
+                                            } else {
+                                                toast.error(response.message || "Failed to create");
                                             }
                                         }
                                     } catch (error: any) {
+                                        console.error("Operation error:", error);
                                         toast.error(error.response?.data?.message || "Operation failed");
                                     }
                                 }}

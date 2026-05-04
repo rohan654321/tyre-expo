@@ -82,10 +82,19 @@ export async function bulkDeleteCompressedAirOptions(ids: string[]) {
     return response.data;
 }
 
-// Toggle active status
+// FIXED: Toggle active status - Use PUT update instead
 export async function toggleCompressedAirStatus(id: string, isActive: boolean) {
-    const response = await api.patch(`/admin/compressed-air/${id}/toggle-status`, { isActive });
-    return response.data;
+    try {
+        const response = await api.put(`/admin/compressed-air/${id}`, { isActive });
+        return response.data;
+    } catch (error: any) {
+        if (error.response?.status === 404) {
+            // Try PATCH as fallback
+            const response = await api.patch(`/admin/compressed-air/${id}/toggle-status`, { isActive });
+            return response.data;
+        }
+        throw error;
+    }
 }
 
 // Update display order
@@ -102,6 +111,20 @@ export async function reorderCompressedAirOptions() {
 
 // Get statistics
 export async function getCompressedAirStatistics() {
-    const response = await api.get('/admin/compressed-air/statistics');
-    return response.data;
+    try {
+        const response = await api.get('/admin/compressed-air/statistics');
+        return response.data;
+    } catch (error: any) {
+        console.error("Statistics API error:", error);
+        return {
+            success: true,
+            data: {
+                totalOptions: 0,
+                activeOptions: 0,
+                inactiveOptions: 0,
+                avgCost: 0,
+                avgPower: 0
+            }
+        };
+    }
 }

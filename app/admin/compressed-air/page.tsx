@@ -1,4 +1,3 @@
-// app/admin/compressed-air/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -13,7 +12,6 @@ import {
     updateCompressedAirOption,
     deleteCompressedAirOption,
     toggleCompressedAirStatus,
-    getCompressedAirStatistics,
     CompressedAirOption
 } from "@/lib/api/compressedAir";
 import toast from "react-hot-toast";
@@ -40,6 +38,27 @@ export default function AdminCompressedAirPage() {
         displayOrder: 1,
     });
 
+    // Calculate statistics locally from options
+    const calculateLocalStatistics = (optionsList: CompressedAirOption[]) => {
+        const totalOptions = optionsList.length;
+        const activeOptions = optionsList.filter(opt => opt.isActive).length;
+        const inactiveOptions = totalOptions - activeOptions;
+        const avgCost = optionsList.length > 0
+            ? optionsList.reduce((sum, opt) => sum + opt.costPerConnection, 0) / optionsList.length
+            : 0;
+        const avgPower = optionsList.length > 0
+            ? optionsList.reduce((sum, opt) => sum + opt.powerKW, 0) / optionsList.length
+            : 0;
+
+        setStatistics({
+            totalOptions,
+            activeOptions,
+            inactiveOptions,
+            avgCost,
+            avgPower
+        });
+    };
+
     const fetchOptions = async () => {
         try {
             setLoading(true);
@@ -49,7 +68,11 @@ export default function AdminCompressedAirPage() {
             });
 
             if (response.success) {
-                setOptions(response.data || []);
+                const fetchedOptions = response.data || [];
+                setOptions(fetchedOptions);
+                calculateLocalStatistics(fetchedOptions);
+            } else {
+                toast.error(response.message || "Failed to load compressed air options");
             }
         } catch (error) {
             console.error("Failed to fetch compressed air options:", error);
@@ -59,27 +82,8 @@ export default function AdminCompressedAirPage() {
         }
     };
 
-    const fetchStatistics = async () => {
-        try {
-            const response = await getCompressedAirStatistics();
-            if (response.success) {
-                const stats = response.data;
-                setStatistics({
-                    totalOptions: stats.totalOptions || 0,
-                    activeOptions: stats.activeOptions || 0,
-                    inactiveOptions: stats.inactiveOptions || 0,
-                    avgCost: stats.costStats?.avgCost || 0,
-                    avgPower: stats.powerStats?.avgPower || 0,
-                });
-            }
-        } catch (error) {
-            console.error("Failed to fetch statistics:", error);
-        }
-    };
-
     useEffect(() => {
         fetchOptions();
-        fetchStatistics();
     }, [statusFilter]);
 
     const handleSearch = () => {
@@ -93,7 +97,6 @@ export default function AdminCompressedAirPage() {
                 if (response.success) {
                     toast.success("Compressed air option deleted successfully");
                     fetchOptions();
-                    fetchStatistics();
                 } else {
                     toast.error(response.message || "Failed to delete");
                 }
@@ -108,8 +111,12 @@ export default function AdminCompressedAirPage() {
             const response = await toggleCompressedAirStatus(id, !currentStatus);
             if (response.success) {
                 toast.success(`Option ${!currentStatus ? 'activated' : 'deactivated'} successfully`);
-                fetchOptions();
-                fetchStatistics();
+                // Update local state immediately
+                const updatedOptions = options.map(opt =>
+                    opt.id === id ? { ...opt, isActive: !currentStatus } : opt
+                );
+                setOptions(updatedOptions);
+                calculateLocalStatistics(updatedOptions);
             } else {
                 toast.error(response.message || "Failed to update status");
             }
@@ -168,7 +175,7 @@ export default function AdminCompressedAirPage() {
                 </button>
             </div>
 
-            {/* Statistics Cards */}
+            {/* Statistics Cards - Now calculated locally */}
             <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 gap-4">
                 <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
                     <p className="text-2xl font-bold text-white">{statistics.totalOptions}</p>
@@ -187,7 +194,7 @@ export default function AdminCompressedAirPage() {
                     <p className="text-xs text-gray-400">Avg Connection Cost</p>
                 </div>
                 <div className="bg-blue-500/10 rounded-xl p-4 border border-blue-500/30">
-                    <p className="text-2xl font-bold text-blue-400">{statistics.avgPower} kW</p>
+                    <p className="text-2xl font-bold text-blue-400">{statistics.avgPower.toFixed(1)} kW</p>
                     <p className="text-xs text-gray-400">Avg Power</p>
                 </div>
             </div>
@@ -301,8 +308,7 @@ export default function AdminCompressedAirPage() {
                                             <span className="text-green-400 font-bold">{formatCurrency(option.costPerConnection + (option.powerKW * 3500))}</span>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium ${option.isActive ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'
-                                                }`}>
+                                            <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium ${option.isActive ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>
                                                 {option.isActive ? <CheckCircle size={12} /> : <XCircle size={12} />}
                                                 {option.isActive ? 'Active' : 'Inactive'}
                                             </span>
@@ -312,8 +318,8 @@ export default function AdminCompressedAirPage() {
                                                 <button
                                                     onClick={() => handleToggleStatus(option.id, option.isActive)}
                                                     className={`p-1.5 rounded-lg transition ${option.isActive
-                                                            ? 'text-gray-400 hover:text-red-400 hover:bg-red-500/20'
-                                                            : 'text-gray-400 hover:text-green-400 hover:bg-green-500/20'
+                                                        ? 'text-gray-400 hover:text-red-400 hover:bg-red-500/20'
+                                                        : 'text-gray-400 hover:text-green-400 hover:bg-green-500/20'
                                                         }`}
                                                     title={option.isActive ? "Deactivate" : "Activate"}
                                                 >
@@ -342,9 +348,6 @@ export default function AdminCompressedAirPage() {
                                                     <Trash2 size={16} />
                                                 </button>
                                             </div>
-                                        </td>
-                                        <td className="px-4 py-3 text-sm text-gray-300">
-                                            {formatCurrency(parseInt(formData.costPerConnection) || 0)}
                                         </td>
                                     </tr>
                                 ))}
@@ -483,7 +486,8 @@ export default function AdminCompressedAirPage() {
                                                 toast.success("Compressed air option updated successfully");
                                                 setShowModal(false);
                                                 fetchOptions();
-                                                fetchStatistics();
+                                            } else {
+                                                toast.error(response.message || "Failed to update");
                                             }
                                         } else {
                                             const response = await createCompressedAirOption({
@@ -497,10 +501,12 @@ export default function AdminCompressedAirPage() {
                                                 toast.success("Compressed air option created successfully");
                                                 setShowModal(false);
                                                 fetchOptions();
-                                                fetchStatistics();
+                                            } else {
+                                                toast.error(response.message || "Failed to create");
                                             }
                                         }
                                     } catch (error: any) {
+                                        console.error("Operation error:", error);
                                         toast.error(error.response?.data?.message || "Operation failed");
                                     }
                                 }}

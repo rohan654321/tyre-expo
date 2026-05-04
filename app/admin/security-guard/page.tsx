@@ -23,6 +23,7 @@ export default function AdminSecurityGuardPage() {
     const [validationError, setValidationError] = useState<string | null>(null);
     const [rateHistory, setRateHistory] = useState<any[]>([]);
     const [showHistory, setShowHistory] = useState(false);
+    const [historyError, setHistoryError] = useState(false);
 
     // Fetch current configuration on component mount
     useEffect(() => {
@@ -44,14 +45,21 @@ export default function AdminSecurityGuardPage() {
         }
     };
 
+    // FIXED: fetchRateHistory with better error handling
     const fetchRateHistory = async () => {
         try {
             const history = await getSecurityGuardRateHistory();
             if (history.success) {
                 setRateHistory(history.data || []);
+                setHistoryError(false);
+            } else {
+                setRateHistory([]);
+                setHistoryError(true);
             }
         } catch (error) {
             console.error('Failed to fetch rate history:', error);
+            setRateHistory([]);
+            setHistoryError(true);
         }
     };
 
@@ -110,13 +118,17 @@ export default function AdminSecurityGuardPage() {
     const formatCurrency = (amount: number) => `₹${amount.toLocaleString()}`;
     const formatDate = (dateString: string) => {
         if (!dateString) return 'N/A';
-        return new Date(dateString).toLocaleDateString('en-IN', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
+        try {
+            return new Date(dateString).toLocaleDateString('en-IN', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        } catch {
+            return 'Invalid date';
+        }
     };
 
     if (loading) {
@@ -259,7 +271,7 @@ export default function AdminSecurityGuardPage() {
                 )}
             </div>
 
-            {/* Rate History Section */}
+            {/* Rate History Section - FIXED with error handling */}
             <div className="bg-gray-800/50 rounded-xl border border-gray-700 overflow-hidden mb-6">
                 <button
                     onClick={() => setShowHistory(!showHistory)}
@@ -275,9 +287,17 @@ export default function AdminSecurityGuardPage() {
 
                 {showHistory && (
                     <div className="border-t border-gray-700">
-                        {rateHistory.length === 0 ? (
+                        {historyError ? (
                             <div className="p-6 text-center text-gray-400">
-                                No rate history available
+                                <History className="h-12 w-12 text-gray-500 mx-auto mb-3" />
+                                <p>Rate history feature coming soon</p>
+                                <p className="text-sm text-gray-500 mt-1">Current rate: {formatCurrency(rate)} per day</p>
+                            </div>
+                        ) : rateHistory.length === 0 ? (
+                            <div className="p-6 text-center text-gray-400">
+                                <History className="h-12 w-12 text-gray-500 mx-auto mb-3" />
+                                <p>No rate history available yet</p>
+                                <p className="text-sm text-gray-500 mt-1">Current rate: {formatCurrency(rate)} per day</p>
                             </div>
                         ) : (
                             <div className="overflow-x-auto">

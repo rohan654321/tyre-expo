@@ -75,7 +75,8 @@ const navigation = [
             }
         ]
     },
-    { name: "Media", icon: Camera, color: "text-pink-500", href: "/admin/media" },
+    // { name: "Media", icon: Camera, color: "text-pink-500", href: "/admin/media" },
+    { name: "Manuals", icon: FileText, color: "text-green-500", href: "/admin/manual" },
     { name: "Reports", icon: BarChart3, color: "text-teal-500", href: "/admin/reports" },
 ];
 

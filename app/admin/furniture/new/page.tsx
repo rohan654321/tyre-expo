@@ -50,8 +50,8 @@ export default function CreateFurniturePage() {
             toast.error("Description is required");
             return;
         }
-        if (!formData.cost3Days) {
-            toast.error("Rental price is required");
+        if (!formData.cost3Days || parseInt(formData.cost3Days) <= 0) {
+            toast.error("Valid rental price is required");
             return;
         }
 
@@ -75,7 +75,8 @@ export default function CreateFurniturePage() {
             }
         } catch (error: any) {
             console.error("Create furniture error:", error);
-            toast.error(error.response?.data?.message || "Failed to create furniture");
+            const errorMsg = error.response?.data?.message || error.message || "Failed to create furniture";
+            toast.error(errorMsg);
         } finally {
             setLoading(false);
         }
@@ -102,7 +103,7 @@ export default function CreateFurniturePage() {
                         </label>
                         <div className="border-2 border-dashed border-gray-600 rounded-lg p-4 text-center">
                             {imagePreview ? (
-                                <div className="relative">
+                                <div className="relative inline-block">
                                     <img src={imagePreview} alt="Preview" className="max-h-48 mx-auto rounded-lg" />
                                     <button
                                         type="button"
