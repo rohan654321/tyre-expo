@@ -1,44 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { BanknotesIcon, ArrowLeftIcon, CheckCircleIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
-
-interface DepositTier {
-  id: string;
-  category: string;
-  minSqMtr: number;
-  maxSqMtr: number;
-  amountINR: number;
-  amountUSD: number;
-}
-
-const depositTiers: DepositTier[] = [
-  { id: '1', category: '0-36', minSqMtr: 0, maxSqMtr: 36, amountINR: 25000, amountUSD: 300 },
-  { id: '2', category: '37-100', minSqMtr: 37, maxSqMtr: 100, amountINR: 50000, amountUSD: 600 },
-  { id: '3', category: '101+', minSqMtr: 101, maxSqMtr: 999, amountINR: 100000, amountUSD: 1200 },
-];
-
-function SuccessPage({ onBack }: { onBack: () => void }) {
-  return (
-    <div className="max-w-2xl mx-auto text-center py-12">
-      <div className="bg-white rounded-2xl shadow-sm p-8">
-        <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-          <CheckCircleIcon className="h-8 w-8 text-green-600" />
-        </div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Security Deposit Submitted!</h2>
-        <p className="text-gray-600 mb-6">Your security deposit information has been submitted successfully.</p>
-        <button onClick={onBack} className="px-6 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition">
-          Back to Requirements
-        </button>
-      </div>
-    </div>
-  );
-}
+import { BanknotesIcon, ArrowLeftIcon, CheckCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { securityDepositAPI, extraRequirementsAPI, SecurityDepositTier } from '@/lib/api/exhibitorClient';
 
 export default function SecurityDepositPage() {
   const router = useRouter();
-  const [selectedTier, setSelectedTier] = useState<DepositTier | null>(null);
+  const [tiers, setTiers] = useState<SecurityDepositTier[]>([]);
+  const [selectedTier, setSelectedTier] = useState<SecurityDepositTier | null>(null);
+  const [boothArea, setBoothArea] = useState<number>(0);
   const [formData, setFormData] = useState({
     ddNo: '',
     bankName: '',
@@ -47,21 +18,141 @@ export default function SecurityDepositPage() {
     amountWords: '',
   });
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Fetch security deposit tiers
+  useEffect(() => {
+    const fetchTiers = async () => {
+      try {
+        setLoading(true);
+        const response = await securityDepositAPI.getActive();
+        if (response.success) {
+          setTiers(response.data);
+
+          // Try to get booth area from localStorage
+          const boothDetails = JSON.parse(localStorage.getItem('exhibitorBoothDetails') || '{}');
+          const area = parseFloat(boothDetails.sqMtrBooked) || 0;
+          setBoothArea(area);
+
+          // Auto-select tier based on booth area
+          if (area > 0) {
+            const matchingTier = response.data.find(tier =>
+              area >= tier.minSqMtr && area <= tier.maxSqMtr
+            );
+            if (matchingTier) {
+              setSelectedTier(matchingTier);
+              setFormData(prev => ({
+                ...prev,
+                amountWords: numberToWords(matchingTier.amountINR)
+              }));
+            }
+          }
+        } else {
+          setError('Failed to load security deposit tiers');
+        }
+      } catch (err: any) {
+        console.error('Error fetching tiers:', err);
+        setError(err.message || 'Failed to load tiers');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTiers();
+  }, []);
+
+  // Helper function to convert number to words (simplified version)
+  const numberToWords = (num: number): string => {
+    if (num === 25000) return 'Twenty Five Thousand Only';
+    if (num === 50000) return 'Fifty Thousand Only';
+    if (num === 100000) return 'One Lakh Only';
+    return '';
+  };
+
+  const handleTierSelect = (tier: SecurityDepositTier) => {
+    setSelectedTier(tier);
+    setFormData(prev => ({
+      ...prev,
+      amountWords: numberToWords(tier.amountINR)
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!selectedTier) {
       alert('Please select a security deposit tier');
       return;
     }
-    setSubmitted(true);
+
+    if (!formData.ddNo || !formData.bankName || !formData.branch || !formData.dated) {
+      alert('Please fill all demand draft details');
+      return;
+    }
+
+    setSubmitting(true);
+    setError(null);
+
+    try {
+      const generalInfo = JSON.parse(localStorage.getItem('exhibitorGeneralInfo') || '{}');
+      const boothDetails = JSON.parse(localStorage.getItem('exhibitorBoothDetails') || '{}');
+
+      const response = await extraRequirementsAPI.submit({
+        generalInfo,
+        boothDetails,
+        eventName: 'Tyre Expo 2024',
+        securityDeposit: {
+          boothSq: boothArea || selectedTier.minSqMtr,
+          amountINR: selectedTier.amountINR,
+          ddNo: formData.ddNo,
+          bankName: formData.bankName,
+          branch: formData.branch,
+          dated: formData.dated,
+          amountWords: formData.amountWords
+        },
+        notes: `Security Deposit for booth area ${boothArea || selectedTier.category} sq.m`
+      });
+
+      if (response.success) {
+        setSubmitted(true);
+      } else {
+        setError(response.error || 'Failed to submit security deposit');
+      }
+    } catch (err: any) {
+      console.error('Error submitting:', err);
+      setError(err.response?.data?.error || err.message || 'Failed to submit');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const handleBack = () => {
-    router.push('/dashboard/requirements');
-  };
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto text-center py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto"></div>
+        <p className="mt-4 text-gray-600">Loading security deposit tiers...</p>
+      </div>
+    );
+  }
 
-  if (submitted) return <SuccessPage onBack={handleBack} />;
+  if (submitted) {
+    return (
+      <div className="max-w-2xl mx-auto text-center py-12">
+        <div className="bg-white rounded-2xl shadow-sm p-8">
+          <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+            <CheckCircleIcon className="h-8 w-8 text-green-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Security Deposit Submitted!</h2>
+          <p className="text-gray-600 mb-6">Your security deposit information has been submitted successfully.</p>
+          <button onClick={() => router.push('/dashboard/requirements')} className="px-6 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition">
+            Back to Requirements
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -78,27 +169,38 @@ export default function SecurityDepositPage() {
         </div>
       </div>
 
+      {error && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+          {error}
+        </div>
+      )}
+
+      {boothArea > 0 && (
+        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-blue-700 text-sm">
+          Your booth area: {boothArea} sq.m
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           {/* Deposit Tiers */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <h2 className="text-lg font-semibold text-gray-800 mb-4">Select Security Deposit Amount</h2>
             <div className="space-y-3">
-              {depositTiers.map((tier) => (
+              {tiers.map((tier) => (
                 <label
                   key={tier.id}
-                  className={`flex items-center justify-between p-4 border rounded-xl cursor-pointer transition ${
-                    selectedTier?.id === tier.id
+                  className={`flex items-center justify-between p-4 border rounded-xl cursor-pointer transition ${selectedTier?.id === tier.id
                       ? 'border-emerald-500 bg-emerald-50'
                       : 'border-gray-200 hover:border-emerald-300'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center gap-4">
                     <input
                       type="radio"
                       name="depositTier"
                       checked={selectedTier?.id === tier.id}
-                      onChange={() => setSelectedTier(tier)}
+                      onChange={() => handleTierSelect(tier)}
                       className="w-4 h-4 text-emerald-600"
                     />
                     <div>
@@ -178,6 +280,7 @@ export default function SecurityDepositPage() {
                       onChange={(e) => setFormData({ ...formData, amountWords: e.target.value })}
                       className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500"
                       placeholder="e.g., Twenty Five Thousand Only"
+                      readOnly
                     />
                   </div>
                 </div>
@@ -216,10 +319,10 @@ export default function SecurityDepositPage() {
 
           <button
             onClick={handleSubmit}
-            disabled={!selectedTier}
+            disabled={submitting || !selectedTier}
             className="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold rounded-xl hover:from-emerald-600 hover:to-teal-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Submit Security Deposit
+            {submitting ? 'Submitting...' : 'Submit Security Deposit'}
           </button>
         </div>
       </div>

@@ -1,18 +1,20 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { 
-  UserIcon, 
-  BuildingOfficeIcon, 
-  EnvelopeIcon, 
-  PhoneIcon, 
+import {
+  UserIcon,
+  BuildingOfficeIcon,
+  EnvelopeIcon,
+  PhoneIcon,
   IdentificationIcon,
-  ArrowLeftIcon, 
+  ArrowLeftIcon,
   CheckCircleIcon,
   BriefcaseIcon,
-  GlobeAltIcon
+  GlobeAltIcon,
+  ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
+import { profileAPI, extraRequirementsAPI } from '@/lib/api/exhibitorClient';
 
 interface BasicInfo {
   title: string;
@@ -61,13 +63,50 @@ export default function BasicInfoPage() {
     website: '',
   });
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch existing profile data
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        setLoading(true);
+        const response = await profileAPI.get();
+        if (response.success && response.data) {
+          const profile = response.data;
+          setFormData({
+            title: profile.metadata?.title || 'Mr',
+            firstName: profile.name?.split(' ')[0] || '',
+            lastName: profile.name?.split(' ')[1] || '',
+            designation: profile.contactPersonJobTitle || '',
+            mobile: profile.phone || '',
+            email: profile.email || '',
+            companyName: profile.company || '',
+            businessNature: profile.businessNature || '',
+            gstNumber: profile.gstNumber || '',
+            panNumber: profile.registrationNumber || '',
+            website: profile.website || '',
+          });
+        }
+      } catch (err: any) {
+        console.error('Error fetching profile:', err);
+        // Don't show error for missing profile, just use empty form
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     // Basic validation
     if (!formData.firstName || !formData.lastName || !formData.email || !formData.mobile || !formData.companyName) {
       alert('Please fill all required fields');
@@ -81,12 +120,66 @@ export default function BasicInfoPage() {
       alert('Please enter a valid 10-digit mobile number');
       return;
     }
-    setSubmitted(true);
+
+    setSaving(true);
+    setError(null);
+
+    try {
+      // Save to profile API
+      const profileData = {
+        name: `${formData.firstName} ${formData.lastName}`,
+        email: formData.email,
+        phone: formData.mobile,
+        company: formData.companyName,
+        businessNature: formData.businessNature,
+        gstNumber: formData.gstNumber,
+        registrationNumber: formData.panNumber,
+        website: formData.website,
+        contactPersonJobTitle: formData.designation,
+        metadata: {
+          title: formData.title,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+        }
+      };
+
+      await profileAPI.update(profileData);
+
+      // Also save to localStorage for easy access in other forms
+      localStorage.setItem('exhibitorGeneralInfo', JSON.stringify({
+        companyName: formData.companyName,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        mobile: formData.mobile,
+        designation: formData.designation,
+        gstNumber: formData.gstNumber,
+        panNumber: formData.panNumber,
+        website: formData.website,
+        businessNature: formData.businessNature,
+      }));
+
+      setSubmitted(true);
+    } catch (err: any) {
+      console.error('Error saving basic info:', err);
+      setError(err.response?.data?.error || err.message || 'Failed to save information');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleBack = () => {
     router.push('/dashboard/requirements');
   };
+
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto text-center py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+        <p className="mt-4 text-gray-600">Loading your information...</p>
+      </div>
+    );
+  }
 
   if (submitted) return <SuccessPage onBack={handleBack} />;
 
@@ -104,6 +197,12 @@ export default function BasicInfoPage() {
           <p className="text-gray-500 text-sm">REQUIRED - Company and contact details</p>
         </div>
       </div>
+
+      {error && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+          {error}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Personal Details */}
@@ -284,9 +383,10 @@ export default function BasicInfoPage() {
           </button>
           <button
             type="submit"
-            className="flex-1 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-indigo-600 transition"
+            disabled={saving}
+            className="flex-1 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-indigo-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Save & Continue
+            {saving ? 'Saving...' : 'Save & Continue'}
           </button>
         </div>
       </form>

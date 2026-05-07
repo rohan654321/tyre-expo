@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   ComputerDesktopIcon,
@@ -9,8 +9,10 @@ import {
   ShoppingCartIcon,
   MinusIcon,
   PlusIcon,
-  PhotoIcon
+  PhotoIcon,
+  ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
+import { furnitureAPI, extraRequirementsAPI } from '@/lib/api/exhibitorClient';
 
 interface FurnitureItem {
   id: string;
@@ -20,20 +22,9 @@ interface FurnitureItem {
   quantity: number;
   imageUrl: string;
   category: string;
+  stockStatus?: string;
+  inStock?: boolean;
 }
-
-const furnitureCatalog: FurnitureItem[] = [
-  { id: 'table-1', name: 'Display Table', description: 'Premium wooden display table 6ft x 3ft', pricePerDay: 800, quantity: 0, imageUrl: '/images/display-table.jpg', category: 'Tables' },
-  { id: 'table-2', name: 'Round Conference Table', description: 'Glass top conference table with 4 chairs', pricePerDay: 1200, quantity: 0, imageUrl: '/images/conference-table.jpg', category: 'Tables' },
-  { id: 'chair-1', name: 'Executive Chair', description: 'Leather executive chair with armrest', pricePerDay: 400, quantity: 0, imageUrl: '/images/executive-chair.jpg', category: 'Chairs' },
-  { id: 'chair-2', name: 'Visitor Chair', description: 'Comfortable visitor chair with cushion', pricePerDay: 250, quantity: 0, imageUrl: '/images/visitor-chair.jpg', category: 'Chairs' },
-  { id: 'sofa-1', name: 'Lounge Sofa', description: '3-seater premium lounge sofa', pricePerDay: 1500, quantity: 0, imageUrl: '/images/lounge-sofa.jpg', category: 'Seating' },
-  { id: 'counter', name: 'Reception Counter', description: 'Modern reception counter with logo space', pricePerDay: 2000, quantity: 0, imageUrl: '/images/reception-counter.jpg', category: 'Counters' },
-  { id: 'cabinet', name: 'Storage Cabinet', description: 'Lockable storage cabinet with keys', pricePerDay: 600, quantity: 0, imageUrl: '/images/storage-cabinet.jpg', category: 'Storage' },
-  { id: 'display-1', name: 'Product Display Stand', description: 'Adjustable acrylic display stand', pricePerDay: 500, quantity: 0, imageUrl: '/images/display-stand.jpg', category: 'Display' },
-  { id: 'shelf', name: 'Wall Shelf Unit', description: 'Wall-mounted display shelving', pricePerDay: 700, quantity: 0, imageUrl: '/images/shelf-unit.jpg', category: 'Display' },
-  { id: 'plant', name: 'Decorative Plant', description: 'Artificial indoor plant for decor', pricePerDay: 300, quantity: 0, imageUrl: '/images/decor-plant.jpg', category: 'Decor' },
-];
 
 function SuccessPage({ onBack }: { onBack: () => void }) {
   return (
@@ -54,10 +45,40 @@ function SuccessPage({ onBack }: { onBack: () => void }) {
 
 export default function FurnitureRequirementsPage() {
   const router = useRouter();
-  const [items, setItems] = useState<FurnitureItem[]>(furnitureCatalog);
+  const [items, setItems] = useState<FurnitureItem[]>([]);
   const [rentalDays, setRentalDays] = useState(3);
   const [submitted, setSubmitted] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  // Fetch furniture from API
+  useEffect(() => {
+    const fetchFurniture = async () => {
+      try {
+        setLoading(true);
+        const response = await furnitureAPI.getAll();
+        if (response.success) {
+          // Map API response to component format with quantity
+          const itemsWithQuantity = response.data.map((item: any) => ({
+            ...item,
+            quantity: 0
+          }));
+          setItems(itemsWithQuantity);
+        } else {
+          setError('Failed to load furniture items');
+        }
+      } catch (err: any) {
+        console.error('Error fetching furniture:', err);
+        setError(err.message || 'Failed to load furniture');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFurniture();
+  }, []);
 
   const updateQuantity = (id: string, delta: number) => {
     setItems(items.map(item => {
@@ -79,17 +100,55 @@ export default function FurnitureRequirementsPage() {
   // Get unique categories
   const categories = ['all', ...new Set(items.map(i => i.category))];
 
-  const filteredItems = selectedCategory === 'all' 
-    ? items 
+  const filteredItems = selectedCategory === 'all'
+    ? items
     : items.filter(i => i.category === selectedCategory);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedItems.length === 0) {
       alert('Please select at least one furniture item');
       return;
     }
-    setSubmitted(true);
+
+    setSubmitting(true);
+    try {
+      // Format furniture items for API
+      const furnitureItems = selectedItems.map(item => ({
+        id: item.id,
+        code: item.id,
+        name: item.name,
+        quantity: item.quantity,
+        cost: item.pricePerDay,
+        totalCost: item.pricePerDay * item.quantity * rentalDays
+      }));
+
+      // Get general info from localStorage or context
+      const generalInfo = JSON.parse(localStorage.getItem('exhibitorGeneralInfo') || '{}');
+      const boothDetails = JSON.parse(localStorage.getItem('exhibitorBoothDetails') || '{}');
+
+      // Submit to API
+      const response = await extraRequirementsAPI.submit({
+        generalInfo,
+        boothDetails,
+        eventName: 'Tyre Expo 2024',
+        furnitureItems,
+        notes: `Rental duration: ${rentalDays} days`
+      });
+
+      if (response.success) {
+        setSubmitted(true);
+        // Clear cart from localStorage if needed
+        localStorage.removeItem('furnitureCart');
+      } else {
+        setError(response.error || 'Failed to submit requirement');
+      }
+    } catch (err: any) {
+      console.error('Error submitting:', err);
+      setError(err.response?.data?.error || err.message || 'Failed to submit');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleBack = () => {
@@ -97,6 +156,33 @@ export default function FurnitureRequirementsPage() {
   };
 
   if (submitted) return <SuccessPage onBack={handleBack} />;
+
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto text-center py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+        <p className="mt-4 text-gray-600">Loading furniture catalog...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-7xl mx-auto">
+        <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+          <ExclamationTriangleIcon className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-red-800 mb-2">Error Loading Furniture</h3>
+          <p className="text-red-600 mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -122,11 +208,10 @@ export default function FurnitureRequirementsPage() {
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition whitespace-nowrap ${
-                  selectedCategory === cat
+                className={`px-4 py-2 rounded-full text-sm font-medium transition whitespace-nowrap ${selectedCategory === cat
                     ? 'bg-purple-600 text-white'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
+                  }`}
               >
                 {cat.charAt(0).toUpperCase() + cat.slice(1)}
               </button>
@@ -136,14 +221,23 @@ export default function FurnitureRequirementsPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {filteredItems.map((item) => (
               <div key={item.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition">
-                {/* Image Placeholder */}
+                {/* Image */}
                 <div className="h-40 bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center relative">
-                  <PhotoIcon className="h-12 w-12 text-purple-300" />
+                  {item.imageUrl ? (
+                    <img src={item.imageUrl} alt={item.name} className="h-full w-full object-cover" />
+                  ) : (
+                    <PhotoIcon className="h-12 w-12 text-purple-300" />
+                  )}
                   <div className="absolute top-2 right-2 bg-white/90 rounded-full px-2 py-1 text-xs font-medium text-purple-600">
                     {item.category}
                   </div>
+                  {item.stockStatus === 'out_of_stock' && (
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                      <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">Out of Stock</span>
+                    </div>
+                  )}
                 </div>
-                
+
                 <div className="p-4">
                   <h3 className="font-semibold text-gray-800">{item.name}</h3>
                   <p className="text-xs text-gray-500 mt-1">{item.description}</p>
@@ -155,7 +249,8 @@ export default function FurnitureRequirementsPage() {
                       <button
                         type="button"
                         onClick={() => updateQuantity(item.id, -1)}
-                        className="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition"
+                        disabled={item.stockStatus === 'out_of_stock'}
+                        className="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <MinusIcon className="h-4 w-4" />
                       </button>
@@ -163,7 +258,8 @@ export default function FurnitureRequirementsPage() {
                       <button
                         type="button"
                         onClick={() => updateQuantity(item.id, 1)}
-                        className="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition"
+                        disabled={item.stockStatus === 'out_of_stock'}
+                        className="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <PlusIcon className="h-4 w-4" />
                       </button>
@@ -227,10 +323,10 @@ export default function FurnitureRequirementsPage() {
 
             <button
               onClick={handleSubmit}
-              disabled={selectedItems.length === 0}
+              disabled={selectedItems.length === 0 || submitting}
               className="w-full py-2.5 bg-white text-purple-600 font-semibold rounded-lg hover:bg-gray-100 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Submit Rental Request
+              {submitting ? 'Submitting...' : 'Submit Rental Request'}
             </button>
           </div>
 

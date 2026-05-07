@@ -29,7 +29,7 @@ const navigation = [
   { name: 'Brands', href: '/dashboard/brands', icon: DocumentTextIcon },
   { name: 'Brochures', href: '/dashboard/brochures', icon: DocumentTextIcon },
   { name: 'Requirements', href: '/dashboard/requirements', icon: CogIcon },
-  { name: 'Exhibitor Manual', href: '/dashboard/manual', icon: BookOpenIcon },
+  { name: 'Exhibitor Manual', href: '/dashboard/exhibitormanual', icon: BookOpenIcon },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {

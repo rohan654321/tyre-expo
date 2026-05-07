@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   MapPinIcon,
@@ -12,8 +12,10 @@ import {
   ArrowLeftIcon,
   CheckCircleIcon,
   DocumentTextIcon,
-  ShieldCheckIcon
+  ShieldCheckIcon,
+  ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
+import { boothAPI, extraRequirementsAPI } from '@/lib/api/exhibitorClient';
 
 interface BoothDetails {
   boothNo: string;
@@ -66,13 +68,63 @@ export default function BoothDetailsPage() {
     contractorPAN: '',
   });
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch existing booth details
+  useEffect(() => {
+    const fetchBoothDetails = async () => {
+      try {
+        setLoading(true);
+        const response = await boothAPI.getDetails();
+        if (response.success && response.data) {
+          const data = response.data;
+          setFormData({
+            boothNo: data.boothNumber || '',
+            sqMtrBooked: data.size || '',
+            organisation: '',
+            contactPerson: '',
+            designation: '',
+            mobile: '',
+            email: '',
+            contractorCompany: '',
+            contractorPerson: '',
+            contractorMobile: '',
+            contractorEmail: '',
+            contractorGST: '',
+            contractorPAN: '',
+          });
+        }
+
+        // Also try to load from localStorage
+        const savedBooth = localStorage.getItem('exhibitorBoothDetails');
+        if (savedBooth) {
+          const parsed = JSON.parse(savedBooth);
+          setFormData(prev => ({ ...prev, ...parsed }));
+        }
+      } catch (err: any) {
+        console.error('Error fetching booth details:', err);
+        // Try localStorage as fallback
+        const savedBooth = localStorage.getItem('exhibitorBoothDetails');
+        if (savedBooth) {
+          setFormData(JSON.parse(savedBooth));
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBoothDetails();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     // Basic validation for required fields
     if (!formData.boothNo || !formData.sqMtrBooked || !formData.organisation || !formData.contactPerson || !formData.mobile || !formData.email) {
       alert('Please fill all required fields');
@@ -82,12 +134,52 @@ export default function BoothDetailsPage() {
       alert('Please enter a valid email address');
       return;
     }
-    setSubmitted(true);
+
+    setSaving(true);
+    setError(null);
+
+    try {
+      // Save to localStorage for other forms to use
+      localStorage.setItem('exhibitorBoothDetails', JSON.stringify(formData));
+
+      // Save to booth API
+      await boothAPI.saveDetails({
+        boothNumber: formData.boothNo,
+        size: formData.sqMtrBooked,
+        contactPerson: formData.contactPerson,
+        mobile: formData.mobile,
+        email: formData.email,
+        contractorDetails: {
+          company: formData.contractorCompany,
+          person: formData.contractorPerson,
+          mobile: formData.contractorMobile,
+          email: formData.contractorEmail,
+          gst: formData.contractorGST,
+          pan: formData.contractorPAN,
+        }
+      });
+
+      setSubmitted(true);
+    } catch (err: any) {
+      console.error('Error saving booth details:', err);
+      setError(err.response?.data?.error || err.message || 'Failed to save booth details');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleBack = () => {
     router.push('/dashboard/requirements');
   };
+
+  if (loading) {
+    return (
+      <div className="max-w-5xl mx-auto text-center py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto"></div>
+        <p className="mt-4 text-gray-600">Loading booth details...</p>
+      </div>
+    );
+  }
 
   if (submitted) return <SuccessPage onBack={handleBack} />;
 
@@ -105,6 +197,12 @@ export default function BoothDetailsPage() {
           <p className="text-gray-500 text-sm">REQUIRED - Registration of contractor for bare space exhibitors</p>
         </div>
       </div>
+
+      {error && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+          {error}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Booth Details */}
@@ -339,9 +437,10 @@ export default function BoothDetailsPage() {
           </button>
           <button
             type="submit"
-            className="flex-1 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold rounded-xl hover:from-amber-600 hover:to-orange-600 transition"
+            disabled={saving}
+            className="flex-1 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold rounded-xl hover:from-amber-600 hover:to-orange-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Save Booth Details
+            {saving ? 'Saving...' : 'Save Booth Details'}
           </button>
         </div>
       </form>

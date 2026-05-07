@@ -25,15 +25,17 @@ interface ManualPDF {
     description: string;
     category: string;
     version: string;
-    file_name: string;
-    file_size: string;
-    file_path: string;
-    mime_type: string;
+    file_name: string | null;
+    file_size: string | null;
+    file_path: string | null;
+    mime_type?: string;
     last_updated: string;
-    updated_by: string;
+    updated_by?: string;
     downloads: number;
     status: 'published' | 'draft';
     type: 'section' | 'pdf';
+
+    content?: string; // ✅ ADD THIS
 }
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
@@ -413,7 +415,7 @@ export default function AdminManualPage() {
         });
     };
 
-    const formatFileSize = (size: string) => {
+    const formatFileSize = (size?: string | null) => {
         if (!size) return '0 KB';
         return size;
     };

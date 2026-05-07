@@ -1,15 +1,20 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   BoltIcon,
   ArrowLeftIcon,
   CalculatorIcon,
   CheckCircleIcon,
-  CurrencyDollarIcon,
-  DocumentTextIcon,
+  ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
+import { electricalAPI, extraRequirementsAPI } from '@/lib/api/exhibitorClient';
+
+interface ElectricalRates {
+  temporary: { ratePerKW: number };
+  exhibition: { ratePerKW: number };
+}
 
 export default function ElectricalRequirementsPage() {
   const router = useRouter();
@@ -22,23 +27,110 @@ export default function ElectricalRequirementsPage() {
     lightingPoints: 0,
     specialEquipment: '',
   });
+  const [rates, setRates] = useState<ElectricalRates | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch electrical rates with fallback values
+  useEffect(() => {
+    const fetchRates = async () => {
+      try {
+        setLoading(true);
+        const response = await electricalAPI.getActiveRates();
+        if (response.success && response.data) {
+          setRates(response.data);
+        } else {
+          // Set fallback rates if API fails
+          console.warn('Using fallback electrical rates');
+          setRates({
+            temporary: { ratePerKW: 3500 },
+            exhibition: { ratePerKW: 3500 }
+          });
+        }
+      } catch (err: any) {
+        console.error('Error fetching rates:', err);
+        // Use fallback rates on error
+        setRates({
+          temporary: { ratePerKW: 3500 },
+          exhibition: { ratePerKW: 3500 }
+        });
+        setError('Could not load rates from server. Using default values.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRates();
+  }, []);
 
   const calculateTotal = () => {
+    if (!rates) return 0;
     const tempKW = parseFloat(formData.temporaryLoad) || 0;
     const exhKW = parseFloat(formData.exhibitionLoad) || 0;
     const socketCost = (formData.sockets || 0) * 1500;
     const lightingCost = (formData.lightingPoints || 0) * 800;
-    return (tempKW * 3500) + (exhKW * 3500) + socketCost + lightingCost;
+    return (tempKW * (rates.temporary?.ratePerKW || 3500)) +
+      (exhKW * (rates.exhibition?.ratePerKW || 3500)) +
+      socketCost +
+      lightingCost;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => {
-      router.push('/dashboard/requirements');
-    }, 2000);
+
+    if (!formData.temporaryLoad && !formData.exhibitionLoad) {
+      alert('Please enter at least one electrical load requirement');
+      return;
+    }
+
+    setSubmitting(true);
+    setError(null);
+
+    try {
+      const generalInfo = JSON.parse(localStorage.getItem('exhibitorGeneralInfo') || '{}');
+      const boothDetails = JSON.parse(localStorage.getItem('exhibitorBoothDetails') || '{}');
+
+      const totalCost = calculateTotal();
+
+      const response = await extraRequirementsAPI.submit({
+        generalInfo,
+        boothDetails,
+        eventName: 'Tyre Expo 2024',
+        electricalLoad: {
+          temporaryLoad: formData.temporaryLoad || '0',
+          temporaryTotal: (parseFloat(formData.temporaryLoad) || 0) * (rates?.temporary?.ratePerKW || 3500),
+          exhibitionLoad: formData.exhibitionLoad || '0',
+          exhibitionTotal: (parseFloat(formData.exhibitionLoad) || 0) * (rates?.exhibition?.ratePerKW || 3500),
+        },
+        notes: `Voltage: ${formData.voltage}V, Phase: ${formData.phase}, Sockets: ${formData.sockets}, Lighting: ${formData.lightingPoints}, Special Equipment: ${formData.specialEquipment || 'None'}`
+      });
+
+      if (response.success) {
+        setSubmitted(true);
+        setTimeout(() => {
+          router.push('/dashboard/requirements');
+        }, 2000);
+      } else {
+        setError(response.error || 'Failed to submit requirement');
+      }
+    } catch (err: any) {
+      console.error('Error submitting:', err);
+      setError(err.response?.data?.error || err.message || 'Failed to submit');
+    } finally {
+      setSubmitting(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto text-center py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+        <p className="mt-4 text-gray-600">Loading electrical rates...</p>
+      </div>
+    );
+  }
 
   if (submitted) {
     return (
@@ -60,6 +152,10 @@ export default function ElectricalRequirementsPage() {
     );
   }
 
+  // Safe access to rates with fallback
+  const tempRate = rates?.temporary?.ratePerKW || 3500;
+  const exhRate = rates?.exhibition?.ratePerKW || 3500;
+
   return (
     <div className="max-w-4xl mx-auto">
       {/* Header */}
@@ -79,6 +175,12 @@ export default function ElectricalRequirementsPage() {
         </div>
       </div>
 
+      {error && (
+        <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-700 text-sm">
+          ⚠️ {error}
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Form */}
         <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
@@ -86,7 +188,7 @@ export default function ElectricalRequirementsPage() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Temporary Load (Setup Days) <span className="text-red-500">*</span>
+                  Temporary Load (Setup Days)
                 </label>
                 <div className="relative">
                   <input
@@ -96,15 +198,14 @@ export default function ElectricalRequirementsPage() {
                     onChange={(e) => setFormData({ ...formData, temporaryLoad: e.target.value })}
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Enter KW"
-                    required
                   />
                   <span className="absolute right-3 top-2.5 text-gray-400 text-sm">KW</span>
                 </div>
-                <p className="text-xs text-gray-400 mt-1">@ ₹3,500 per KW</p>
+                <p className="text-xs text-gray-400 mt-1">@ ₹{tempRate.toLocaleString()} per KW</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Exhibition Load (Show Days) <span className="text-red-500">*</span>
+                  Exhibition Load (Show Days)
                 </label>
                 <div className="relative">
                   <input
@@ -114,11 +215,10 @@ export default function ElectricalRequirementsPage() {
                     onChange={(e) => setFormData({ ...formData, exhibitionLoad: e.target.value })}
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Enter KW"
-                    required
                   />
                   <span className="absolute right-3 top-2.5 text-gray-400 text-sm">KW</span>
                 </div>
-                <p className="text-xs text-gray-400 mt-1">@ ₹3,500 per KW</p>
+                <p className="text-xs text-gray-400 mt-1">@ ₹{exhRate.toLocaleString()} per KW</p>
               </div>
             </div>
 
@@ -153,6 +253,7 @@ export default function ElectricalRequirementsPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Power Sockets</label>
                 <input
                   type="number"
+                  min="0"
                   value={formData.sockets}
                   onChange={(e) => setFormData({ ...formData, sockets: parseInt(e.target.value) || 0 })}
                   className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500"
@@ -164,6 +265,7 @@ export default function ElectricalRequirementsPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Lighting Points</label>
                 <input
                   type="number"
+                  min="0"
                   value={formData.lightingPoints}
                   onChange={(e) => setFormData({ ...formData, lightingPoints: parseInt(e.target.value) || 0 })}
                   className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500"
@@ -186,9 +288,10 @@ export default function ElectricalRequirementsPage() {
 
             <button
               type="submit"
-              className="w-full py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-cyan-600 transition"
+              disabled={submitting}
+              className="w-full py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-cyan-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Submit Electrical Requirement
+              {submitting ? 'Submitting...' : 'Submit Electrical Requirement'}
             </button>
           </form>
         </div>
@@ -203,11 +306,11 @@ export default function ElectricalRequirementsPage() {
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">
                 <span>Temporary Load:</span>
-                <span>₹{((parseFloat(formData.temporaryLoad) || 0) * 3500).toLocaleString()}</span>
+                <span>₹{((parseFloat(formData.temporaryLoad) || 0) * tempRate).toLocaleString()}</span>
               </div>
               <div className="flex justify-between">
                 <span>Exhibition Load:</span>
-                <span>₹{((parseFloat(formData.exhibitionLoad) || 0) * 3500).toLocaleString()}</span>
+                <span>₹{((parseFloat(formData.exhibitionLoad) || 0) * exhRate).toLocaleString()}</span>
               </div>
               <div className="flex justify-between">
                 <span>Sockets:</span>
