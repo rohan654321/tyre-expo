@@ -1,7 +1,7 @@
 // app/exhibition-directory/company-grid.tsx
 'use client';
 
-import { ExhibitionCompany } from './api';
+import { ExhibitionCompany, generateSlug } from '@/lib/api/exhibitorClient';
 import CompanyCard from './company-card';
 import { Building, MapPin } from 'lucide-react';
 
@@ -20,6 +20,7 @@ export default function CompanyGrid({ companies, viewMode, onProductBrochureClic
             key={company.id}
             company={{
               id: company.id,
+              slug: company.slug || generateSlug(company.name),
               name: company.name,
               pavilion: company.pavilion,
               stand: company.standNumber,
@@ -43,6 +44,7 @@ export default function CompanyGrid({ companies, viewMode, onProductBrochureClic
             key={company.id}
             company={{
               id: company.id,
+              slug: company.slug || generateSlug(company.name),
               name: company.name,
               pavilion: company.pavilion,
               stand: company.standNumber,
@@ -80,8 +82,8 @@ export default function CompanyGrid({ companies, viewMode, onProductBrochureClic
               <td className="p-4">
                 <div className="flex items-center gap-3">
                   {company.logo && (
-                    <img 
-                      src={company.logo} 
+                    <img
+                      src={company.logo}
                       alt={company.name}
                       className="w-10 h-10 rounded-lg object-cover"
                       onError={(e) => {

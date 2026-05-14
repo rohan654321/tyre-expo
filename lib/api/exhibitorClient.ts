@@ -1,3 +1,4 @@
+// lib/api/exhibitorClient.ts
 import axios from 'axios';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
@@ -9,7 +10,7 @@ const exhibitorClient = axios.create({
     },
 });
 
-// Add auth token
+// Add auth token - but don't redirect for public endpoints
 exhibitorClient.interceptors.request.use((config) => {
     const token = localStorage.getItem('tyre_expo_token') || localStorage.getItem('exhibitorToken');
     if (token) {
@@ -18,11 +19,23 @@ exhibitorClient.interceptors.request.use((config) => {
     return config;
 });
 
-// Handle 401
+// Handle 401 - but only for auth-required pages, not for API calls
+// We'll handle 401 errors gracefully in the individual API calls
 exhibitorClient.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response?.status === 401) {
+        // Only redirect for auth endpoints, not for public data endpoints
+        const isAuthEndpoint = error.config?.url?.includes('/auth/') ||
+            error.config?.url?.includes('/login') ||
+            error.config?.url?.includes('/profile');
+
+        if (error.response?.status === 401 && !isAuthEndpoint) {
+            // Just log the error, don't redirect
+            console.warn('Authentication required for endpoint:', error.config?.url);
+            return Promise.reject(error);
+        }
+
+        if (error.response?.status === 401 && isAuthEndpoint) {
             localStorage.removeItem('tyre_expo_token');
             localStorage.removeItem('exhibitorToken');
             localStorage.removeItem('exhibitorData');
@@ -31,6 +44,100 @@ exhibitorClient.interceptors.response.use(
         return Promise.reject(error);
     }
 );
+
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
+
+export function generateSlug(text: string): string {
+    if (!text) return '';
+    return text
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '');
+}
+
+// ============================================
+// EXHIBITION COMPANY INTERFACE (For public directory)
+// ============================================
+
+export interface ExhibitionCompany {
+    id: string;
+    slug: string;
+    name: string;
+    shortName?: string;
+    description?: string;
+    fullAddress?: string;
+    logo?: string;
+    country: string;
+    countryCode?: string;
+    pavilion: string;
+    hall?: string;
+    standNumber: string;
+    sector: string[];
+    website?: string;
+    contactPerson?: {
+        name?: string;
+        jobTitle?: string;
+        email?: string;
+        phone?: string;
+    };
+}
+
+// ============================================
+// PRODUCT INTERFACE
+// ============================================
+
+export interface Product {
+    id: string;
+    name: string;
+    title?: string;
+    description?: string;
+    price?: string;
+    image?: string;
+    category?: string;
+    specifications?: string;
+    imageUrl?: string;
+    createdAt?: string;
+    updatedAt?: string;
+}
+
+// ============================================
+// BROCHURE INTERFACE
+// ============================================
+
+export interface Brochure {
+    id: string;
+    name: string;
+    title?: string;
+    description?: string;
+    fileUrl?: string;
+    url?: string;
+    filePath?: string;
+    fileName?: string;
+    fileSize?: number;
+    fileType?: string;
+    downloads?: number;
+    isPublic?: boolean;
+    createdAt?: string;
+    updatedAt?: string;
+}
+
+// ============================================
+// BRAND INTERFACE
+// ============================================
+
+export interface Brand {
+    id: string;
+    name: string;
+    description?: string;
+    logo?: string;
+    logoUrl?: string;
+    logoPath?: string;
+    isPublic?: boolean;
+    createdAt?: string;
+    updatedAt?: string;
+}
 
 // ============================================
 // AUTH ENDPOINTS
@@ -60,7 +167,7 @@ export const authAPI = {
 };
 
 // ============================================
-// DASHBOARD ENDPOINTS
+// DASHBOARD ENDPOINTS (Require Auth)
 // ============================================
 
 export const dashboardAPI = {
@@ -118,7 +225,7 @@ export const dashboardAPI = {
 };
 
 // ============================================
-// PROFILE ENDPOINTS (UPDATED)
+// PROFILE ENDPOINTS (Require Auth)
 // ============================================
 
 export interface CompanyProfile {
@@ -150,7 +257,6 @@ export interface CompanyProfile {
     metadata?: any;
 }
 
-
 export const profileAPI = {
     get: async (): Promise<{ success: boolean; data: CompanyProfile }> => {
         const response = await exhibitorClient.get('/exhibitorDashboard/profile');
@@ -160,7 +266,6 @@ export const profileAPI = {
         const response = await exhibitorClient.put('/exhibitorDashboard/profile', data);
         return response.data;
     },
-    // Use the new upload endpoint that accepts file directly
     uploadLogo: async (file: File): Promise<{ success: boolean; data: { logoUrl: string; publicId: string }; error?: string }> => {
         const formData = new FormData();
         formData.append('logo', file);
@@ -176,20 +281,8 @@ export const profileAPI = {
 };
 
 // ============================================
-// PRODUCTS ENDPOINTS
+// PRODUCTS ENDPOINTS (Require Auth)
 // ============================================
-
-export interface Product {
-    id: string;
-    name: string;
-    description: string;
-    category: string;
-    specifications: string;
-    imageUrl: string;
-    price?: string;
-    createdAt?: string;
-    updatedAt?: string;
-}
 
 export const productsAPI = {
     getAll: async (): Promise<{ success: boolean; data: Product[] }> => {
@@ -215,19 +308,8 @@ export const productsAPI = {
 };
 
 // ============================================
-// BRANDS ENDPOINTS
+// BRANDS ENDPOINTS (Require Auth)
 // ============================================
-
-export interface Brand {
-    id: string;
-    name: string;
-    description: string;
-    logoUrl: string;
-    logoPath?: string;
-    isPublic?: boolean;
-    createdAt?: string;
-    updatedAt?: string;
-}
 
 export const brandsAPI = {
     getAll: async (): Promise<{ success: boolean; data: Brand[] }> => {
@@ -261,24 +343,8 @@ export const brandsAPI = {
 };
 
 // ============================================
-// BROCHURES ENDPOINTS
+// BROCHURES ENDPOINTS (Require Auth)
 // ============================================
-
-export interface Brochure {
-    id: string;
-    name: string;
-    title: string;
-    description: string;
-    fileUrl: string;
-    filePath?: string;
-    fileName?: string;
-    fileSize: number;
-    fileType?: string;
-    downloads: number;
-    isPublic?: boolean;
-    createdAt: string;
-    updatedAt?: string;
-}
 
 export const brochuresAPI = {
     getAll: async (): Promise<{ success: boolean; data: Brochure[] }> => {
@@ -310,7 +376,267 @@ export const brochuresAPI = {
 };
 
 // ============================================
-// REQUIREMENTS ENDPOINTS
+// PUBLIC EXHIBITION DIRECTORY API
+// ============================================
+
+const publicApiClient = axios.create({
+    baseURL: API_BASE,
+    headers: {
+        'Content-Type': 'application/json',
+    },
+});
+
+// No auth redirect for public client
+publicApiClient.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        console.warn('Public API error:', error.config?.url, error.response?.status);
+        return Promise.reject(error);
+    }
+);
+
+export async function fetchExhibitionCompanies(
+    page: number = 1,
+    limit: number = 24,
+    search: string = ""
+): Promise<{ companies: ExhibitionCompany[]; totalPages: number }> {
+    try {
+        const response = await publicApiClient.get('/exhibitors', {
+            params: { page, limit, search }
+        });
+
+        if (response.data.success && response.data.data) {
+            const exhibitors = response.data.data;
+            const companies = exhibitors.map((exhibitor: any) => {
+                const companyName = exhibitor.company || exhibitor.name || '';
+                return {
+                    id: exhibitor.id,
+                    slug: generateSlug(companyName),
+                    name: companyName,
+                    shortName: exhibitor.shortName,
+                    description: exhibitor.description || exhibitor.about,
+                    fullAddress: exhibitor.address,
+                    logo: exhibitor.logoUrl,
+                    country: exhibitor.country || 'Unknown',
+                    countryCode: exhibitor.countryCode,
+                    pavilion: exhibitor.exhibition?.pavilion || exhibitor.pavilion || 'Main Pavilion',
+                    hall: exhibitor.exhibition?.hall || exhibitor.hall,
+                    standNumber: exhibitor.boothNumber || exhibitor.standNumber || exhibitor.exhibition?.standNumber,
+                    sector: Array.isArray(exhibitor.sector) ? exhibitor.sector : (exhibitor.sector ? [exhibitor.sector] : []),
+                    website: exhibitor.website,
+                    contactPerson: {
+                        name: exhibitor.contactPersonName || exhibitor.name,
+                        jobTitle: exhibitor.contactPersonJobTitle || exhibitor.designation,
+                        email: exhibitor.email,
+                        phone: exhibitor.phone || exhibitor.mobile,
+                    },
+                };
+            });
+
+            return {
+                companies,
+                totalPages: Math.ceil((response.data.total || companies.length) / limit)
+            };
+        }
+
+        return { companies: [], totalPages: 0 };
+    } catch (error) {
+        console.error('Error fetching exhibitors:', error);
+        return { companies: [], totalPages: 0 };
+    }
+}
+
+export async function fetchExhibitionCompanyBySlug(slug: string): Promise<ExhibitionCompany | null> {
+    try {
+        // First try to find by ID if slug is a UUID
+        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug);
+
+        if (isUUID) {
+            try {
+                const response = await publicApiClient.get(`/exhibitors/${slug}`);
+                if (response.data.success && response.data.data) {
+                    const exhibitor = response.data.data;
+                    const companyName = exhibitor.company || exhibitor.name || '';
+                    return {
+                        id: exhibitor.id,
+                        slug: generateSlug(companyName),
+                        name: companyName,
+                        shortName: exhibitor.shortName,
+                        description: exhibitor.description || exhibitor.about,
+                        fullAddress: exhibitor.address,
+                        logo: exhibitor.logoUrl,
+                        country: exhibitor.country || 'Unknown',
+                        countryCode: exhibitor.countryCode,
+                        pavilion: exhibitor.exhibition?.pavilion || exhibitor.pavilion || 'Main Pavilion',
+                        hall: exhibitor.exhibition?.hall || exhibitor.hall,
+                        standNumber: exhibitor.boothNumber || exhibitor.standNumber || exhibitor.exhibition?.standNumber,
+                        sector: Array.isArray(exhibitor.sector) ? exhibitor.sector : (exhibitor.sector ? [exhibitor.sector] : []),
+                        website: exhibitor.website,
+                        contactPerson: {
+                            name: exhibitor.contactPersonName || exhibitor.name,
+                            jobTitle: exhibitor.contactPersonJobTitle || exhibitor.designation,
+                            email: exhibitor.email,
+                            phone: exhibitor.phone || exhibitor.mobile,
+                        },
+                    };
+                }
+            } catch (e) {
+                // Not found by ID, continue to search by slug
+            }
+        }
+
+        // Get all exhibitors and find by slug
+        const response = await publicApiClient.get('/exhibitors', {
+            params: { limit: 1000 }
+        });
+
+        if (response.data.success && response.data.data) {
+            const exhibitors = response.data.data;
+
+            const exhibitor = exhibitors.find((ex: any) => {
+                const companyName = ex.company || ex.name || '';
+                const exhibitorSlug = generateSlug(companyName);
+                return exhibitorSlug === slug;
+            });
+
+            if (exhibitor) {
+                const companyName = exhibitor.company || exhibitor.name || '';
+                return {
+                    id: exhibitor.id,
+                    slug: generateSlug(companyName),
+                    name: companyName,
+                    shortName: exhibitor.shortName,
+                    description: exhibitor.description || exhibitor.about,
+                    fullAddress: exhibitor.address,
+                    logo: exhibitor.logoUrl,
+                    country: exhibitor.country || 'Unknown',
+                    countryCode: exhibitor.countryCode,
+                    pavilion: exhibitor.exhibition?.pavilion || exhibitor.pavilion || 'Main Pavilion',
+                    hall: exhibitor.exhibition?.hall || exhibitor.hall,
+                    standNumber: exhibitor.boothNumber || exhibitor.standNumber || exhibitor.exhibition?.standNumber,
+                    sector: Array.isArray(exhibitor.sector) ? exhibitor.sector : (exhibitor.sector ? [exhibitor.sector] : []),
+                    website: exhibitor.website,
+                    contactPerson: {
+                        name: exhibitor.contactPersonName || exhibitor.name,
+                        jobTitle: exhibitor.contactPersonJobTitle || exhibitor.designation,
+                        email: exhibitor.email,
+                        phone: exhibitor.phone || exhibitor.mobile,
+                    },
+                };
+            }
+        }
+
+        return null;
+    } catch (error) {
+        console.error('Error fetching exhibitor by slug:', error);
+        return null;
+    }
+}
+
+
+// ============================================
+// PUBLIC PRODUCTS/BRANDS/BROCHURES API
+// These endpoints should be public but currently require auth
+// We'll try to fetch them but return empty arrays if they fail
+// ============================================
+
+// Create a dedicated public client for exhibitor data that handles 401 gracefully
+const exhibitorPublicClient = axios.create({
+    baseURL: API_BASE,
+    headers: {
+        'Content-Type': 'application/json',
+    },
+});
+
+exhibitorPublicClient.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        // Never redirect, just return empty data
+        console.warn('Public exhibitor data endpoint failed:', error.config?.url, error.response?.status);
+        // Return a mock successful response with empty data
+        return Promise.resolve({
+            data: {
+                success: true,
+                data: []
+            }
+        });
+    }
+);
+
+export async function fetchExhibitorProducts(companyId: string): Promise<Product[]> {
+    try {
+        // Use the public endpoint from exhibitors route
+        const response = await publicApiClient.get(`/exhibitors/${companyId}/products`);
+
+        if (response.data.success && Array.isArray(response.data.data)) {
+            return response.data.data.map((product: any) => ({
+                id: product.id,
+                name: product.name,
+                title: product.title || product.name,
+                description: product.description,
+                price: product.price,
+                image: product.imageUrl,
+                category: product.category,
+                specifications: product.specifications,
+            }));
+        }
+        return [];
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        return [];
+    }
+}
+
+export async function fetchExhibitorBrochures(companyId: string): Promise<Brochure[]> {
+    try {
+        // Use the public endpoint from exhibitors route
+        const response = await publicApiClient.get(`/exhibitors/${companyId}/brochures`);
+
+        if (response.data.success && Array.isArray(response.data.data)) {
+            return response.data.data.map((brochure: any) => ({
+                id: brochure.id,
+                name: brochure.name || brochure.title,
+                title: brochure.title,
+                description: brochure.description,
+                fileUrl: brochure.fileUrl,
+                url: brochure.fileUrl,
+            }));
+        }
+        return [];
+    } catch (error) {
+        console.error('Error fetching brochures:', error);
+        return [];
+    }
+}
+
+export async function fetchExhibitorBrands(companyId: string): Promise<Brand[]> {
+    try {
+        // Use the public endpoint from exhibitors route
+        const response = await publicApiClient.get(`/exhibitors/${companyId}/brands`);
+
+        if (response.data.success && Array.isArray(response.data.data)) {
+            return response.data.data.map((brand: any) => ({
+                id: brand.id,
+                name: brand.name,
+                description: brand.description,
+                logo: brand.logoUrl,
+                logoUrl: brand.logoUrl,
+            }));
+        }
+        return [];
+    } catch (error) {
+        console.error('Error fetching brands:', error);
+        return [];
+    }
+}
+
+// Legacy function for compatibility
+export async function fetchExhibitionCompanyById(id: string): Promise<ExhibitionCompany | null> {
+    return fetchExhibitionCompanyBySlug(id);
+}
+
+// ============================================
+// REQUIREMENTS ENDPOINTS (Require Auth)
 // ============================================
 
 export interface Requirement {
@@ -352,7 +678,7 @@ export const requirementsAPI = {
 };
 
 // ============================================
-// BOOTH ENDPOINTS (UPDATED)
+// BOOTH ENDPOINTS (Require Auth)
 // ============================================
 
 export interface BoothDetails {
@@ -415,7 +741,7 @@ export const boothAPI = {
 };
 
 // ============================================
-// FLOOR PLAN ENDPOINTS
+// FLOOR PLAN ENDPOINTS (Require Auth)
 // ============================================
 
 export interface FloorPlan {
@@ -467,7 +793,7 @@ export const floorPlanAPI = {
 };
 
 // ============================================
-// INVOICE ENDPOINTS
+// INVOICE ENDPOINTS (Require Auth)
 // ============================================
 
 export interface Invoice {
@@ -506,7 +832,7 @@ export const invoiceAPI = {
 };
 
 // ============================================
-// MANUAL ENDPOINTS (FIXED)
+// MANUAL ENDPOINTS (Require Auth)
 // ============================================
 
 export interface ManualSection {
@@ -523,7 +849,6 @@ export const manualAPI = {
             return response.data;
         } catch (error: any) {
             console.error('Error fetching manual:', error);
-            // Return default manual content if API fails
             return {
                 success: true,
                 data: {
@@ -568,7 +893,7 @@ export const manualAPI = {
 };
 
 // ============================================
-// FURNITURE / AV RENTAL ITEMS ENDPOINTS
+// FURNITURE / AV RENTAL ITEMS ENDPOINTS (Require Auth)
 // ============================================
 
 export interface RentalItem {
@@ -583,19 +908,14 @@ export interface RentalItem {
 }
 
 export const rentalItemsAPI = {
-    // Get all rental items (AV & IT Rentals)
     getAll: async (): Promise<{ success: boolean; data: RentalItem[] }> => {
         const response = await exhibitorClient.get('/admin/rental-items');
         return response.data;
     },
-
-    // Get items by category
     getByCategory: async (category: string): Promise<{ success: boolean; data: RentalItem[] }> => {
         const response = await exhibitorClient.get(`/admin/rental-items/category/${category}`);
         return response.data;
     },
-
-    // Calculate cost
     calculateCost: async (items: Array<{ id: string; quantity: number; days: number }>): Promise<{ success: boolean; total: number; details: any }> => {
         const response = await exhibitorClient.post('/admin/rental-items/calculate', { items });
         return response.data;
@@ -603,7 +923,7 @@ export const rentalItemsAPI = {
 };
 
 // ============================================
-// FURNITURE ENDPOINTS
+// FURNITURE ENDPOINTS (Require Auth)
 // ============================================
 
 export interface FurnitureItem {
@@ -618,25 +938,18 @@ export interface FurnitureItem {
 }
 
 export const furnitureAPI = {
-    // Get all furniture items
     getAll: async (): Promise<{ success: boolean; data: FurnitureItem[] }> => {
         const response = await exhibitorClient.get('/admin/furniture');
         return response.data;
     },
-
-    // Get furniture by category
     getByCategory: async (category: string): Promise<{ success: boolean; data: FurnitureItem[] }> => {
         const response = await exhibitorClient.get(`/admin/furniture/category/${category}`);
         return response.data;
     },
-
-    // Search furniture
     search: async (query: string): Promise<{ success: boolean; data: FurnitureItem[] }> => {
         const response = await exhibitorClient.get(`/admin/furniture/search?q=${query}`);
         return response.data;
     },
-
-    // Get single item
     getById: async (id: string): Promise<{ success: boolean; data: FurnitureItem }> => {
         const response = await exhibitorClient.get(`/admin/furniture/${id}`);
         return response.data;
@@ -644,7 +957,7 @@ export const furnitureAPI = {
 };
 
 // ============================================
-// HOSTESS SERVICES ENDPOINTS (FIXED)
+// HOSTESS SERVICES ENDPOINTS (Require Auth)
 // ============================================
 
 export interface HostessCategory {
@@ -658,14 +971,12 @@ export interface HostessCategory {
 }
 
 export const hostessAPI = {
-    // Get all categories with fallback
     getAll: async (): Promise<{ success: boolean; data: HostessCategory[] }> => {
         try {
             const response = await exhibitorClient.get('/admin/hostess-rates');
             return response.data;
         } catch (error: any) {
             console.error('Error fetching hostess categories:', error);
-            // Return fallback data on error
             return {
                 success: true,
                 data: [
@@ -691,15 +1002,12 @@ export const hostessAPI = {
             };
         }
     },
-
-    // Get by type
     getByType: async (type: 'A' | 'B'): Promise<{ success: boolean; data: HostessCategory }> => {
         try {
             const response = await exhibitorClient.get(`/admin/hostess-rates/type/${type}`);
             return response.data;
         } catch (error) {
             console.error(`Error fetching ${type} category:`, error);
-            // Return fallback
             return {
                 success: true,
                 data: type === 'A'
@@ -708,15 +1016,12 @@ export const hostessAPI = {
             };
         }
     },
-
-    // Calculate cost
     calculateCost: async (categoryA: number, categoryB: number, days: number): Promise<{ success: boolean; total: number; details: any }> => {
         try {
             const response = await exhibitorClient.post('/admin/hostess-rates/calculate', { categoryA, categoryB, days });
             return response.data;
         } catch (error) {
             console.error('Error calculating cost:', error);
-            // Fallback calculation
             const total = (categoryA * 5000 + categoryB * 4000) * days;
             return {
                 success: true,
@@ -728,7 +1033,7 @@ export const hostessAPI = {
 };
 
 // ============================================
-// SECURITY GUARD ENDPOINTS (FIXED)
+// SECURITY GUARD ENDPOINTS (Require Auth)
 // ============================================
 
 export interface SecurityGuardConfig {
@@ -741,14 +1046,12 @@ export interface SecurityGuardConfig {
 }
 
 export const securityGuardAPI = {
-    // Get configuration with fallback
     getConfig: async (): Promise<{ success: boolean; data: SecurityGuardConfig }> => {
         try {
             const response = await exhibitorClient.get('/admin/security-guard/config');
             return response.data;
         } catch (error: any) {
             console.error('Error fetching security guard config:', error);
-            // Return default config on error
             return {
                 success: true,
                 data: {
@@ -762,15 +1065,12 @@ export const securityGuardAPI = {
             };
         }
     },
-
-    // Calculate cost
     calculateCost: async (quantity: number, days: number, shiftType: string): Promise<{ success: boolean; total: number; costPerGuard: number }> => {
         try {
             const response = await exhibitorClient.post('/admin/security-guard/calculate', { quantity, days, shiftType });
             return response.data;
         } catch (error) {
             console.error('Error calculating cost:', error);
-            // Fallback calculation
             const multiplier = shiftType === '24' ? 2 : (shiftType === 'night' ? 1.5 : 1);
             const total = quantity * days * 2500 * multiplier;
             return {
@@ -783,7 +1083,7 @@ export const securityGuardAPI = {
 };
 
 // ============================================
-// HOUSEKEEPING ENDPOINTS (FIXED)
+// HOUSEKEEPING ENDPOINTS (Require Auth)
 // ============================================
 
 export interface HousekeepingConfig {
@@ -793,14 +1093,12 @@ export interface HousekeepingConfig {
 }
 
 export const housekeepingAPI = {
-    // Get configuration with fallback
     getConfig: async (): Promise<{ success: boolean; data: HousekeepingConfig }> => {
         try {
             const response = await exhibitorClient.get('/admin/housekeeping/config');
             return response.data;
         } catch (error: any) {
             console.error('Error fetching housekeeping config:', error);
-            // Return default config on error
             return {
                 success: true,
                 data: {
@@ -811,15 +1109,12 @@ export const housekeepingAPI = {
             };
         }
     },
-
-    // Calculate cost
     calculateCost: async (staffCount: number, days: number, shifts: number): Promise<{ success: boolean; total: number; costPerStaff: number }> => {
         try {
             const response = await exhibitorClient.post('/admin/housekeeping/calculate', { staffCount, days, shifts });
             return response.data;
         } catch (error) {
             console.error('Error calculating cost:', error);
-            // Fallback calculation
             const total = staffCount * shifts * days * 2000;
             return {
                 success: true,
@@ -831,7 +1126,7 @@ export const housekeepingAPI = {
 };
 
 // ============================================
-// WATER CONNECTION ENDPOINTS
+// WATER CONNECTION ENDPOINTS (Require Auth)
 // ============================================
 
 export interface WaterConnectionConfig {
@@ -840,13 +1135,10 @@ export interface WaterConnectionConfig {
 }
 
 export const waterConnectionAPI = {
-    // Get configuration
     getConfig: async (): Promise<{ success: boolean; data: WaterConnectionConfig }> => {
         const response = await exhibitorClient.get('/admin/water-connection/config');
         return response.data;
     },
-
-    // Calculate cost
     calculateCost: async (connections: number): Promise<{ success: boolean; total: number; costPerConnection: number }> => {
         const response = await exhibitorClient.post('/admin/water-connection/calculate', { connections });
         return response.data;
@@ -854,7 +1146,7 @@ export const waterConnectionAPI = {
 };
 
 // ============================================
-// COMPRESSED AIR ENDPOINTS
+// COMPRESSED AIR ENDPOINTS (Require Auth)
 // ============================================
 
 export interface CompressedAirOption {
@@ -867,13 +1159,10 @@ export interface CompressedAirOption {
 }
 
 export const compressedAirAPI = {
-    // Get all options
     getAll: async (): Promise<{ success: boolean; data: CompressedAirOption[] }> => {
         const response = await exhibitorClient.get('/admin/compressed-air');
         return response.data;
     },
-
-    // Calculate cost
     calculateCost: async (optionId: string, quantity: number): Promise<{ success: boolean; total: number; details: any }> => {
         const response = await exhibitorClient.post('/admin/compressed-air/calculate', { optionId, quantity });
         return response.data;
@@ -881,7 +1170,7 @@ export const compressedAirAPI = {
 };
 
 // ============================================
-// SECURITY DEPOSIT ENDPOINTS
+// SECURITY DEPOSIT ENDPOINTS (Require Auth)
 // ============================================
 
 export interface SecurityDepositTier {
@@ -895,13 +1184,10 @@ export interface SecurityDepositTier {
 }
 
 export const securityDepositAPI = {
-    // Get active deposits
     getActive: async (): Promise<{ success: boolean; data: SecurityDepositTier[] }> => {
         const response = await exhibitorClient.get('/admin/security-deposit/active');
         return response.data;
     },
-
-    // Get by booth area
     getByBoothArea: async (sqMtr: number): Promise<{ success: boolean; data: SecurityDepositTier }> => {
         const response = await exhibitorClient.post('/admin/security-deposit/calculate', { boothArea: sqMtr });
         return response.data;
@@ -909,7 +1195,7 @@ export const securityDepositAPI = {
 };
 
 // ============================================
-// ELECTRICAL RATES ENDPOINTS (FIXED)
+// ELECTRICAL RATES ENDPOINTS (Require Auth)
 // ============================================
 
 export interface ElectricalRate {
@@ -920,10 +1206,8 @@ export interface ElectricalRate {
 }
 
 export const electricalAPI = {
-    // Get active rates with error handling
     getActiveRates: async (): Promise<{ success: boolean; data: { temporary: ElectricalRate; exhibition: ElectricalRate } }> => {
         try {
-            // Try to fetch from API
             const [tempResponse, exhResponse] = await Promise.all([
                 exhibitorClient.get('/admin/electrical-rates/active/temporary'),
                 exhibitorClient.get('/admin/electrical-rates/active/exhibition')
@@ -938,7 +1222,6 @@ export const electricalAPI = {
             };
         } catch (error) {
             console.warn('Failed to fetch electrical rates from API, using defaults:', error);
-            // Return default rates if API fails
             return {
                 success: true,
                 data: {
@@ -948,15 +1231,12 @@ export const electricalAPI = {
             };
         }
     },
-
-    // Calculate cost
     calculateCost: async (temporaryKW: number, exhibitionKW: number, sockets: number, lightingPoints: number): Promise<{ success: boolean; total: number; details: any }> => {
         try {
             const response = await exhibitorClient.post('/admin/electrical-rates/calculate', { temporaryKW, exhibitionKW, sockets, lightingPoints });
             return response.data;
         } catch (error) {
             console.warn('Failed to calculate via API, using local calculation:', error);
-            // Fallback calculation
             const total = (temporaryKW * 3500) + (exhibitionKW * 3500) + (sockets * 1500) + (lightingPoints * 800);
             return {
                 success: true,
@@ -968,7 +1248,7 @@ export const electricalAPI = {
 };
 
 // ============================================
-// MAIN REQUIREMENT SUBMISSION ENDPOINT
+// MAIN REQUIREMENT SUBMISSION ENDPOINT (Require Auth)
 // ============================================
 
 export interface ExtraRequirementData {
@@ -1056,37 +1336,26 @@ export interface ExtraRequirementData {
 }
 
 export const extraRequirementsAPI = {
-    // Submit complete requirement
     submit: async (data: ExtraRequirementData): Promise<{ success: boolean; data: any; message: string; error?: string }> => {
         const response = await exhibitorClient.post('/exhibitorDashboard/requirements', data);
         return response.data;
     },
-
-    // Get all requirements (for exhibitor dashboard)
     getAll: async (): Promise<{ success: boolean; data: Requirement[] }> => {
         const response = await exhibitorClient.get('/exhibitorDashboard/requirements');
         return response.data;
     },
-
-    // Get single requirement
     getById: async (id: string): Promise<{ success: boolean; data: Requirement }> => {
         const response = await exhibitorClient.get(`/exhibitorDashboard/requirements/${id}`);
         return response.data;
     },
-
-    // Update requirement status (for admin)
     updateStatus: async (id: string, status: string, adminNotes?: string): Promise<{ success: boolean; data: any }> => {
         const response = await exhibitorClient.put(`/admin/extra-requirements/${id}`, { status, adminNotes });
         return response.data;
     },
-
-    // Get statistics (for admin)
     getStats: async (): Promise<{ success: boolean; data: any }> => {
         const response = await exhibitorClient.get('/admin/extra-requirements/stats');
         return response.data;
     },
-
-    // Get all requirements (for admin)
     getAllAdmin: async (page = 1, limit = 10, status?: string, search?: string): Promise<{ success: boolean; data: any[]; pagination: any }> => {
         const params = new URLSearchParams({ page: page.toString(), limit: limit.toString() });
         if (status && status !== 'all') params.append('status', status);

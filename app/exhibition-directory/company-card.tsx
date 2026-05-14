@@ -9,6 +9,7 @@ import VisitorRegistrationForm from './visitor-registration-form'
 interface CompanyCardProps {
   company: {
     id: string
+    slug?: string
     name: string
     pavilion: string
     stand: string
@@ -28,15 +29,17 @@ export default function CompanyCard({ company, onProductBrochureClick }: Company
   const handleCardClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement
     if (
-      target.closest('button') || 
+      target.closest('button') ||
       target.closest('a') ||
       target.tagName === 'BUTTON' ||
       target.tagName === 'A'
     ) {
       return
     }
-    
-    router.push(`/exhibition-directory/${company.id}`)
+
+    // Use slug if available, otherwise use id
+    const path = company.slug ? company.slug : company.id
+    router.push(`/exhibition-directory/${path}`)
   }
 
   const handleConnectClick = (e: React.MouseEvent) => {
@@ -60,14 +63,14 @@ export default function CompanyCard({ company, onProductBrochureClick }: Company
       'bg-gradient-to-br from-teal-50 to-teal-100',
       'bg-gradient-to-br from-yellow-50 to-yellow-100'
     ];
-    
+
     const index = company.name.length % colors.length;
     return colors[index];
   };
 
   return (
     <>
-      <div 
+      <div
         onClick={handleCardClick}
         className="group bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full hover:-translate-y-1 cursor-pointer"
       >
@@ -77,8 +80,8 @@ export default function CompanyCard({ company, onProductBrochureClick }: Company
         >
           {company.logo && !imageError ? (
             <div className="relative w-full h-full">
-              <img 
-                src={company.logo} 
+              <img
+                src={company.logo}
                 alt={company.name}
                 className="w-full h-full object-contain"
                 onError={() => setImageError(true)}
@@ -115,7 +118,7 @@ export default function CompanyCard({ company, onProductBrochureClick }: Company
           </div>
 
           {/* Action Buttons */}
-          <div 
+          <div
             onClick={(e) => e.stopPropagation()}
             className="grid grid-cols-2 gap-2 sm:gap-3 pt-4 border-t border-slate-200"
           >

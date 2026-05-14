@@ -6,7 +6,7 @@ import CompanyGrid from './company-grid'
 import { useRouter } from 'next/navigation'
 import { Search, ChevronDown, Filter, X, Loader2 } from 'lucide-react'
 import BackToTop from '@/components/layout/BackToTop'
-import { fetchExhibitionCompanies, ExhibitionCompany } from './api'
+import { fetchExhibitionCompanies, ExhibitionCompany, generateSlug } from '@/lib/api/exhibitorClient'
 
 export default function CompanyDirectory() {
   const router = useRouter()
@@ -59,13 +59,15 @@ export default function CompanyDirectory() {
 
   // Filter by letter (client-side filtering)
   const filteredCompanies = selectedLetter
-    ? companies.filter(company => 
-        company.name?.toUpperCase().startsWith(selectedLetter)
-      )
+    ? companies.filter(company =>
+      company.name?.toUpperCase().startsWith(selectedLetter)
+    )
     : companies
 
   const handleProductBrochure = (companyId: string, companyName: string) => {
-    router.push(`/exhibition-directory/${companyId}`)
+    const company = companies.find(c => c.id === companyId)
+    const slug = company?.slug || generateSlug(companyName)
+    router.push(`/exhibition-directory/${slug}`)
   }
 
   // Pagination range
@@ -78,11 +80,11 @@ export default function CompanyDirectory() {
       const maxPages = 5
       let start = Math.max(1, currentPage - Math.floor(maxPages / 2))
       let end = Math.min(totalPages, start + maxPages - 1)
-      
+
       if (end - start + 1 < maxPages) {
         start = Math.max(1, end - maxPages + 1)
       }
-      
+
       return Array.from({ length: Math.min(maxPages, totalPages) }, (_, i) => start + i)
     }
   }
@@ -118,11 +120,10 @@ export default function CompanyDirectory() {
                 setSelectedLetter(null)
                 setCurrentPage(1)
               }}
-              className={`px-3 sm:px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                !selectedLetter
+              className={`px-3 sm:px-4 py-2 text-sm font-medium rounded-lg transition-colors ${!selectedLetter
                   ? 'bg-orange-500 text-white'
                   : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-300'
-              }`}
+                }`}
             >
               All
             </button>
@@ -135,11 +136,10 @@ export default function CompanyDirectory() {
                     setSelectedLetter(letter)
                     setCurrentPage(1)
                   }}
-                  className={`w-8 h-8 sm:w-9 sm:h-9 rounded text-sm font-medium transition-colors border flex items-center justify-center ${
-                    selectedLetter === letter
+                  className={`w-8 h-8 sm:w-9 sm:h-9 rounded text-sm font-medium transition-colors border flex items-center justify-center ${selectedLetter === letter
                       ? 'bg-orange-500 text-white border-orange-500'
                       : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-300'
-                  }`}
+                    }`}
                 >
                   {letter}
                 </button>
@@ -152,14 +152,67 @@ export default function CompanyDirectory() {
           </div>
         </div>
 
+        {/* Search Bar */}
+        <div className="mb-6">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+            <input
+              type="text"
+              placeholder="Search by company name or sector..."
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value)
+                setCurrentPage(1)
+              }}
+              className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => {
+                  setSearchQuery('')
+                  setCurrentPage(1)
+                }}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* View Toggle */}
+        <div className="flex justify-end mb-6 gap-2">
+          <button
+            onClick={() => setViewMode('grid')}
+            className={`p-2 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-orange-500 text-white' : 'bg-white text-slate-600 border border-slate-300'
+              }`}
+          >
+            <GridIcon />
+          </button>
+          <button
+            onClick={() => setViewMode('gallery')}
+            className={`p-2 rounded-lg transition-colors ${viewMode === 'gallery' ? 'bg-orange-500 text-white' : 'bg-white text-slate-600 border border-slate-300'
+              }`}
+          >
+            <GalleryIcon />
+          </button>
+          <button
+            onClick={() => setViewMode('list')}
+            className={`p-2 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-orange-500 text-white' : 'bg-white text-slate-600 border border-slate-300'
+              }`}
+          >
+            <ListIcon />
+          </button>
+        </div>
+
         {/* Companies Grid */}
         {loading ? (
           <div className="flex justify-center py-12">
             <Loader2 className="w-8 h-8 animate-spin text-orange-500" />
           </div>
         ) : (
-          <CompanyGrid 
-            companies={filteredCompanies} 
+          <CompanyGrid
+            companies={filteredCompanies}
             viewMode={viewMode}
             onProductBrochureClick={handleProductBrochure}
           />
@@ -177,13 +230,12 @@ export default function CompanyDirectory() {
                 <button
                   onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                   disabled={currentPage === 1}
-                  className={`px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 ${
-                    currentPage === 1
+                  className={`px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 ${currentPage === 1
                       ? 'text-slate-400 cursor-not-allowed'
                       : 'text-slate-700 hover:bg-slate-100'
-                  }`}
+                    }`}
                 >
-                  <ChevronLeft />
+                  <ChevronLeftIcon />
                   <span className="hidden sm:inline">Previous</span>
                 </button>
 
@@ -192,11 +244,10 @@ export default function CompanyDirectory() {
                     <button
                       key={page}
                       onClick={() => setCurrentPage(page)}
-                      className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg text-sm font-medium flex items-center justify-center transition-colors ${
-                        currentPage === page
+                      className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg text-sm font-medium flex items-center justify-center transition-colors ${currentPage === page
                           ? 'bg-orange-500 text-white'
                           : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-300'
-                      }`}
+                        }`}
                     >
                       {page}
                     </button>
@@ -206,14 +257,13 @@ export default function CompanyDirectory() {
                 <button
                   onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                   disabled={currentPage === totalPages}
-                  className={`px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 ${
-                    currentPage === totalPages
+                  className={`px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 ${currentPage === totalPages
                       ? 'text-slate-400 cursor-not-allowed'
                       : 'text-slate-700 hover:bg-slate-100'
-                  }`}
+                    }`}
                 >
                   <span className="hidden sm:inline">Next</span>
-                  <ChevronRight />
+                  <ChevronRightIcon />
                 </button>
               </div>
             </div>
@@ -278,7 +328,7 @@ function ListIcon() {
   )
 }
 
-function ChevronLeft() {
+function ChevronLeftIcon() {
   return (
     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -286,7 +336,7 @@ function ChevronLeft() {
   )
 }
 
-function ChevronRight() {
+function ChevronRightIcon() {
   return (
     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

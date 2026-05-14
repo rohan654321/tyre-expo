@@ -1,16 +1,18 @@
-// app/exhibition-directory/[id]/page.tsx
+// app/exhibition-directory/[slug]/page.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Globe, Eye, Download, MapPin, Building, Package, Tag, File, X, Menu, ArrowLeft, Share2, Phone, Mail, Users, Loader2, ExternalLink, MessageCircle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Globe, Eye, Download, MapPin, Building, Package, Tag, File, X, Menu, ArrowLeft, Share2, Loader2, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { fetchExhibitionCompanyById, fetchExhibitorProducts, fetchExhibitorBrochures, fetchExhibitorBrands, ExhibitionCompany } from '../api';
+import { fetchExhibitionCompanyBySlug, fetchExhibitorProducts, fetchExhibitorBrochures, fetchExhibitorBrands, ExhibitionCompany } from '@/lib/api/exhibitorClient';
 import VisitorRegistrationForm from '../visitor-registration-form';
 
 export default function ExhibitorDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const slug = params.slug as string;
+
   const [activeTab, setActiveTab] = useState<'about' | 'products' | 'brands' | 'brochures'>('about');
   const [company, setCompany] = useState<ExhibitionCompany | null>(null);
   const [products, setProducts] = useState<any[]>([]);
@@ -35,21 +37,28 @@ export default function ExhibitorDetailPage() {
 
   useEffect(() => {
     const loadCompanyData = async () => {
-      if (!params.id) return;
-      
+      if (!slug) return;
+
       setLoading(true);
       setError(null);
-      
+
       try {
-        const companyData = await fetchExhibitionCompanyById(params.id as string);
+        const companyData = await fetchExhibitionCompanyBySlug(slug);
+
+        if (!companyData) {
+          setError('Company not found');
+          setLoading(false);
+          return;
+        }
+
         setCompany(companyData);
-        
+
         const [productsData, brochuresData, brandsData] = await Promise.all([
-          fetchExhibitorProducts(params.id as string),
-          fetchExhibitorBrochures(params.id as string),
-          fetchExhibitorBrands(params.id as string)
+          fetchExhibitorProducts(companyData.id),
+          fetchExhibitorBrochures(companyData.id),
+          fetchExhibitorBrands(companyData.id)
         ]);
-        
+
         setProducts(productsData);
         setBrochures(brochuresData);
         setBrands(brandsData);
@@ -62,7 +71,7 @@ export default function ExhibitorDetailPage() {
     };
 
     loadCompanyData();
-  }, [params.id]);
+  }, [slug]);
 
   const handlePrevious = () => {
     router.back();
@@ -290,12 +299,11 @@ export default function ExhibitorDetailPage() {
               <div className="flex flex-col lg:flex-row lg:items-center gap-6 lg:gap-10">
                 {/* Logo */}
                 <div className="flex-shrink-0">
-                  <div className={`w-full max-w-xs mx-auto lg:mx-0 lg:w-64 lg:h-64 rounded-xl border flex items-center justify-center p-8 overflow-hidden ${
-                    getLogoColor(company.countryCode)
-                  }`}>
+                  <div className={`w-full max-w-xs mx-auto lg:mx-0 lg:w-64 lg:h-64 rounded-xl border flex items-center justify-center p-8 overflow-hidden ${getLogoColor(company.countryCode)
+                    }`}>
                     {company.logo && !imageError ? (
-                      <img 
-                        src={company.logo} 
+                      <img
+                        src={company.logo}
                         alt={company.name}
                         className="w-full h-full object-contain"
                         onError={() => setImageError(true)}
@@ -386,11 +394,10 @@ export default function ExhibitorDetailPage() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
-                  className={`px-4 py-3 sm:px-6 sm:py-3 rounded-xl font-semibold border flex items-center gap-2 transition-all ${
-                    isActive
+                  className={`px-4 py-3 sm:px-6 sm:py-3 rounded-xl font-semibold border flex items-center gap-2 transition-all ${isActive
                       ? 'bg-orange-500 text-white border-orange-500 shadow-sm'
                       : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50 hover:border-slate-400'
-                  } text-sm sm:text-base`}
+                    } text-sm sm:text-base`}
                 >
                   <Icon size={18} className="flex-shrink-0" />
                   <span className={isMobile ? 'hidden sm:inline' : ''}>
@@ -448,7 +455,7 @@ export default function ExhibitorDetailPage() {
                     </li>
                     <li className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-orange-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Users size={20} className="text-orange-500" />
+                        <MapPin size={20} className="text-orange-500" />
                       </div>
                       <div>
                         <p className="text-sm text-slate-500">Stand Number</p>
@@ -481,7 +488,7 @@ export default function ExhibitorDetailPage() {
                       </span>
                     ))}
                   </div>
-                  
+
                   {company.contactPerson && (company.contactPerson.name || company.contactPerson.email || company.contactPerson.phone) && (
                     <div className="mt-6 pt-4 border-t">
                       <h4 className="font-semibold text-slate-900 mb-3">Contact Person</h4>
@@ -494,6 +501,16 @@ export default function ExhibitorDetailPage() {
                         {company.contactPerson.jobTitle && (
                           <p className="text-sm text-slate-700">
                             <span className="font-medium">Title:</span> {company.contactPerson.jobTitle}
+                          </p>
+                        )}
+                        {company.contactPerson.email && (
+                          <p className="text-sm text-slate-700">
+                            <span className="font-medium">Email:</span> {company.contactPerson.email}
+                          </p>
+                        )}
+                        {company.contactPerson.phone && (
+                          <p className="text-sm text-slate-700">
+                            <span className="font-medium">Phone:</span> {company.contactPerson.phone}
                           </p>
                         )}
                       </div>
@@ -510,13 +527,24 @@ export default function ExhibitorDetailPage() {
               {products.length > 0 ? (
                 products.map((product) => (
                   <div key={product.id} className="bg-white rounded-2xl p-6 border shadow-sm hover:shadow-md transition-shadow">
-                    <div className="flex justify-center mb-4">
-                      <div className={`w-20 h-20 sm:w-24 sm:h-24 ${getLogoColor(company.countryCode)} rounded-xl flex items-center justify-center`}>
-                        <div className="text-2xl font-bold text-slate-600">
-                          {company.name.substring(0, 2).toUpperCase()}
+                    {product.image ? (
+                      <div className="flex justify-center mb-4">
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="w-24 h-24 object-contain"
+                          onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex justify-center mb-4">
+                        <div className={`w-20 h-20 sm:w-24 sm:h-24 ${getLogoColor(company.countryCode)} rounded-xl flex items-center justify-center`}>
+                          <div className="text-2xl font-bold text-slate-600">
+                            {company.name.substring(0, 2).toUpperCase()}
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    )}
                     <h3 className="text-lg font-semibold text-slate-900 mb-3 text-center">
                       {product.title || product.name}
                     </h3>
@@ -546,13 +574,21 @@ export default function ExhibitorDetailPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {brands.length > 0 ? (
                 brands.map((brand, index) => (
-                  <div key={index} className="bg-white rounded-2xl p-6 border shadow-sm hover:shadow-md transition-shadow">
+                  <div key={brand.id || index} className="bg-white rounded-2xl p-6 border shadow-sm hover:shadow-md transition-shadow">
                     <div className="flex items-center gap-4">
-                      <div className={`w-14 h-14 sm:w-16 sm:h-16 ${getLogoColor(company.countryCode)} rounded-lg flex items-center justify-center flex-shrink-0`}>
-                        <div className="text-lg font-bold text-slate-600">
-                          {brand.name?.substring(0, 2).toUpperCase() || company.name.substring(0, 2).toUpperCase()}
+                      {brand.logo ? (
+                        <img
+                          src={brand.logo}
+                          alt={brand.name}
+                          className="w-14 h-14 rounded-lg object-contain"
+                        />
+                      ) : (
+                        <div className={`w-14 h-14 sm:w-16 sm:h-16 ${getLogoColor(company.countryCode)} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                          <div className="text-lg font-bold text-slate-600">
+                            {brand.name?.substring(0, 2).toUpperCase() || company.name.substring(0, 2).toUpperCase()}
+                          </div>
                         </div>
-                      </div>
+                      )}
                       <div className="min-w-0">
                         <h3 className="text-lg font-semibold text-slate-900 truncate">{brand.name || company.name}</h3>
                         {brand.description && (
@@ -588,7 +624,7 @@ export default function ExhibitorDetailPage() {
                       {brochures.map((brochure) => {
                         const brochureUrl = brochure.fileUrl || brochure.url;
                         const brochureName = brochure.name || brochure.title || 'Brochure';
-                        
+
                         return (
                           <tr key={brochure.id} className="border-t hover:bg-slate-50">
                             <td className="p-4">
@@ -608,14 +644,12 @@ export default function ExhibitorDetailPage() {
                             <td className="p-4">
                               {brochureUrl ? (
                                 <div className="flex flex-col sm:flex-row gap-2">
-                                  <a
-                                    href={brochureUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
+                                  <button
+                                    onClick={() => setSelectedPdf({ url: brochureUrl, name: brochureName })}
                                     className="px-3 py-2 bg-orange-500 text-white rounded-lg text-sm font-medium hover:bg-orange-600 transition-colors flex items-center justify-center gap-2"
                                   >
                                     <Eye size={16} /> View
-                                  </a>
+                                  </button>
                                   <a
                                     href={brochureUrl}
                                     download={brochureName}
@@ -627,8 +661,8 @@ export default function ExhibitorDetailPage() {
                               ) : (
                                 <span className="text-sm text-slate-500">No file available</span>
                               )}
-                             </td>
-                           </tr>
+                            </td>
+                          </tr>
                         );
                       })}
                     </tbody>
@@ -647,7 +681,7 @@ export default function ExhibitorDetailPage() {
         {/* BOTTOM NAVIGATION */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
           <div className="bg-white rounded-2xl p-6 border shadow-sm">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">              
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <button
                   onClick={handlePrevious}
@@ -656,14 +690,14 @@ export default function ExhibitorDetailPage() {
                   <ChevronLeft size={16} />
                   <span className="hidden sm:inline">Previous</span>
                 </button>
-                
+
                 <Link
                   href="/exhibition-directory"
                   className="px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 text-white bg-orange-500 hover:bg-orange-600"
                 >
                   <span>Back to List</span>
                 </Link>
-                
+
                 <button
                   onClick={handleNext}
                   className="px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 text-slate-700 bg-slate-100 hover:bg-slate-200"

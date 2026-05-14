@@ -32,7 +32,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const hideHeaderFooter = pathname.startsWith("/dashboard") || pathname.startsWith("/register") || pathname.startsWith("/admin");
+  const hideHeaderFooter = pathname.startsWith("/dashboard") || pathname.startsWith("/register") || pathname.startsWith("/admin") || pathname === "/exhibition-directory" || pathname.startsWith("/exhibition-directory/");
   return (
     <html
       lang="en"
